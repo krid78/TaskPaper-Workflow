@@ -19,32 +19,33 @@ import datetime as dt
 import re
 
 __FILES__ = [
-    "/Users/krid/Dropbox/_Notes/00-Inbox.taskpaper",
+    #"/Users/krid/Dropbox/_Notes/00-Inbox.taskpaper",
     #"/Users/krid/Dropbox/_Notes/10-Work.taskpaper",
     #"/Users/krid/Dropbox/_Notes/20-Home.taskpaper",
     #"/Users/krid/Dropbox/_Notes/30-doing.taskpaper",
     #"/Users/krid/Dropbox/_Notes/40-Studenten.taskpaper",
     #"/Users/krid/Dropbox/_Notes/50-Geschenke.taskpaper",
-    #"/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
+    "/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
 ]
 
 __WEEKDAYS__ = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 __REGEX_WEEKNUMBERS__ = r'@due\(kw([1-9]|[0-4][0-9]|5[0-3])\)'
 __REGEX_DUE_DATES__ = r'@due\((\d{4})-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])\)'
+
 def calc_times(today):
     """calculate some day and time values"""
     tomorrow = today + dt.timedelta(days=1)
-    theweek = today.isocalendar()[1]
+    thisweek = today.isocalendar()[1]
     # and now an array of the dates of the week, relative to today
     weekdays = {}
     for day in range(today.weekday(), 8):
         wday = today.date() + dt.timedelta(days=day)
         weekdays[dt.date.weekday(wday)] = wday
 
-    __logger__.debug("tomorrow %s, theweek %s", tomorrow, theweek)
+    __logger__.debug("tomorrow %s, thisweek %s", tomorrow, thisweek)
     __logger__.debug(weekdays)
 
-    return tomorrow, theweek, weekdays
+    return tomorrow, thisweek, weekdays
 
 def clear_relatives(line):
     """remove @today, @tomorrow, @overdue"""
@@ -64,6 +65,19 @@ def change_dates(line, thedate, today, tomorrow):
 
     return line
 
+def handle_week(line, today, tomorrow, week, thisweek):
+    """check the week number"""
+    tomorrow_week = tomorrow.isocalendar()[1]
+    __logger__.debug("Week of tomorrow: %d", tomorrow_week)
+    if week == thisweek:
+        line += " @today"
+    elif thisweek > week:
+        line += " @overdue"
+    elif thisweek+1 == tomorrow_week:
+        line += " @tomorrow"
+
+    return line
+
 def handle_file(file_, today):
     """handle one file"""
     with codecs.open(file_, "r", 'utf8') as myfile:
@@ -72,8 +86,9 @@ def handle_file(file_, today):
     if contents == '':
         return 0
 
-    tomorrow, theweek, weekdays = calc_times(today)
-    regex_due = re.compile(__REGEX_DUE_DATES__)
+    tomorrow, thisweek, weekdays = calc_times(today)
+    regex_due  = re.compile(__REGEX_DUE_DATES__)
+    regex_week = re.compile(__REGEX_WEEKNUMBERS__)
 
     if contents[0].startswith("Last run at"):
         firstline = 1
@@ -82,13 +97,13 @@ def handle_file(file_, today):
 
     __logger__.debug("firstline %d", firstline)
 
-    output = "Last run at %s" % (today.strftime("%a, %Y-%m-%d %H:%M"))
+    output = "Last run at %s\n" % (today.strftime("%a, %Y-%m-%d %H:%M"))
 
     for line in contents[firstline:]:
         if line.startswith("\n"):
             continue
         #remove current line break
-        line = line[:-1]
+        line = line.rstrip()
         #add linebrake to last line
         output += "\n"
 
@@ -98,6 +113,7 @@ def handle_file(file_, today):
             continue
 
         # if we have a due, we will recalculate the relative date form it
+        # so we can in any case remove the relatives for now
         if '@due' in line:
             line = clear_relatives(line)
         else:
@@ -110,13 +126,22 @@ def handle_file(file_, today):
             thedate = dt.date(year=int(due_match.group(1)),
                               month=int(due_match.group(2)),
                               day=int(due_match.group(3)))
+            __logger__.debug("Found date: %s", thedate)
             line = change_dates(line, thedate, today, tomorrow)
 
         # and the calendar weeks
+        week_match = regex_week.search(line)
+        if week_match != None:
+            week = int(week_match.group(1))
+            __logger__.debug("Found week: %d", week)
+            line = handle_week(line, today, tomorrow, week, thisweek)
 
         output += line
 
-    sys.stdout.write(output)
+    output += "\n"
+
+    with codecs.open(file_, "w", 'utf8') as myfile:
+        myfile.write(output)
 
 def main():
     """the working cow"""
