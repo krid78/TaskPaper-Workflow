@@ -8,4 +8,6 @@ This is more or less a collection of scripts and workflows I found everywhere in
 
 ## Credits
 
+* feedback.py: Peter Okma
+
 ## Author
