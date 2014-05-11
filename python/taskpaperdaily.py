@@ -9,7 +9,7 @@ Email         :  daniel.kriesten@etit.tu-chemnitz.de
 Creation Date :  Di  6 Mai 18:27:28 2014
 """
 
-import sys
+import sys, os
 import codecs
 import argparse
 import logging
@@ -17,15 +17,16 @@ __logger__ = logging.getLogger(__name__)
 import logging.handlers
 import datetime as dt
 import re
+import runcommand
 
 __FILES__ = [
     #"/Users/krid/Dropbox/_Notes/00-Inbox.taskpaper",
-    #"/Users/krid/Dropbox/_Notes/10-Work.taskpaper",
+    "/Users/krid/Dropbox/_Notes/10-Work.taskpaper",
     #"/Users/krid/Dropbox/_Notes/20-Home.taskpaper",
     #"/Users/krid/Dropbox/_Notes/30-doing.taskpaper",
     #"/Users/krid/Dropbox/_Notes/40-Studenten.taskpaper",
     #"/Users/krid/Dropbox/_Notes/50-Geschenke.taskpaper",
-    "/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
+    #"/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
 ]
 
 __WEEKDAYS__ = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
@@ -49,9 +50,9 @@ def calc_times(today):
 
 def clear_relatives(line):
     """remove @today, @tomorrow, @overdue"""
-    line.replace("@today", "")
-    line.replace("@tomorrow", "")
-    line.replace("@overdue", "")
+    line = line.replace(" @today", "")
+    line = line.replace(" @tomorrow", "")
+    line = line.replace(" @overdue", "")
     return line
 
 def change_dates(line, thedate, today, tomorrow):
@@ -142,6 +143,7 @@ def handle_file(file_, today):
 
     with codecs.open(file_, "w", 'utf8') as myfile:
         myfile.write(output)
+    #sys.stdout.write(output)
 
 def main():
     """the working cow"""
@@ -163,6 +165,7 @@ def main():
                         default=False,
                         action="store_true",
                         help="do debugging to stderr")
+    parser.add_argument("-a", "--applescriptbase", default=".", help="the base path for the apple scripts")
 
     (options, args) = parser.parse_known_args()
 
@@ -191,7 +194,17 @@ def main():
     # cycle through all files
     #TODO list as argument
     for thefile in __FILES__:
-        handle_file(thefile, today)
+        cmd = runcommand.RunCommand(["osascript", options.applescriptbase + "/GetNamesOfOpenDocuments.scpt",
+                                     os.path.basename(thefile)])
+        cmdres = cmd.run()
+        __logger__.debug("Result: %s", cmdres)
+        if len(cmdres) > 0 and cmdres[0] == "false":
+            handle_file(thefile, today)
+        else:
+            __logger__.info("File is currently opened in TP")
+            cmd = runcommand.RunCommand(["osascript", options.applescriptbase + "/ParseDueDates.scpt", thefile])
+            cmdres = cmd.run()
+
 
 if __name__ == '__main__':
     main()
