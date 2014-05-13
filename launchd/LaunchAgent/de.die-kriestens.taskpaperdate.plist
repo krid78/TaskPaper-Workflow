@@ -3,7 +3,7 @@
 <plist version="1.0">
 	<dict>
 		<key>Label</key>
-		<string>de.die-kriestens.taskpaperdaily</string>
+		<string>de.die-kriestens.taskpaperdate</string>
 		<key>Disabled</key>
 		<false/>
 		<key>WorkingDirectory</key>
@@ -12,15 +12,15 @@
 		<array>
 			<string>/usr/bin/env</string>
 			<string>python</string>
-			<string>taskpaperdaily.py</string>
+			<string>taskpaperdate.py</string>
 			<string>-v</string>
 			<string>-a</string>
 			<string>.</string>
 		</array>
 		<key>StandardErrorPath</key>
-		<string>/Users/krid/Library/Logs/LaunchAgents/taskpaperdaily.log</string>
+		<string>/Users/krid/Library/Logs/LaunchAgents/taskpaperdate.log</string>
 		<key>StandardOutPath</key>
-		<string>/Users/krid/Library/Logs/LaunchAgents/taskpaperdaily.log</string>
+		<string>/Users/krid/Library/Logs/LaunchAgents/taskpaperdate.log</string>
 	<key>StartCalendarInterval</key>
 	<dict>
 		<!-- run the job 5 Minutes before the full hour -->

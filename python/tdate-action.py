@@ -4,7 +4,7 @@
 import os
 import datetime as dt
 import runcommand as rc
-import taskpaperdaily as td
+import taskpaperdate as td
 
 __THE_FILE__    = "{query}"
 
@@ -19,11 +19,15 @@ if __name__ == "__main__":
     # service the file
     cmd = rc.RunCommand(["osascript", "GetNamesOfOpenDocuments.scpt", os.path.basename(thefile)])
     cmdres = cmd.run()
-    if len(cmdres) > 0 and cmdres[0] == "false":
-        td.handle_file(thefile, today)
-    else:
-        cmd = rc.RunCommand(["osascript", "ParseDueDates.scpt", os.path.basename(thefile)])
+    if cmdres == None:
+        print "cdmres of %s is None" % (cmd)
+    elif len(cmdres) > 0 and cmdres[0] == "false":
+        handle_file(thefile, today)
+    elif len(cmdres) > 0 and cmdres[0] == "true":
+        cmd = rc.RunCommand(["osascript", options.applescriptbase + "/ParseDueDates.scpt", os.path.basename(thefile)])
         cmdres = cmd.run()
+    else:
+        print "Could not handle result %s of %s" % (cmdres, cmd)
 
     print "Done: %s" % (thefile)
 

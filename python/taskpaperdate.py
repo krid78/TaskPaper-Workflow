@@ -206,7 +206,7 @@ def main():
             __logger__.info("cdmres of %s is None", cmd)
         elif len(cmdres) > 0 and cmdres[0] == "false":
             handle_file(thefile, today)
-        elif len(cmdres) > 0 and cmdres[0] == "false":
+        elif len(cmdres) > 0 and cmdres[0] == "true":
             __logger__.info("File is currently opened in TP")
             cmd = rc.RunCommand(["osascript", options.applescriptbase + "/ParseDueDates.scpt", os.path.basename(thefile)])
             cmdres = cmd.run()

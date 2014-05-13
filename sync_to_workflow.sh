@@ -9,6 +9,7 @@ WF_DIR=/Users/krid/Dropbox/Apps/Alfredv2/Alfred.alfredpreferences/workflows/user
 SRC_FILES="python/feedback.py \
 python/open_taskpaper_files.py \
 python/runcommand.py \
+python/taskpaperdate.py \
 python/taskpaperdaily.py \
 applescript/GetNamesOfOpenDocuments.scpt \
 applescript/ParseDueDates.scpt"
@@ -18,6 +19,9 @@ for SRC_FILE in ${SRC_FILES}; do
   echo "Copy \"${SRC_FILE##*/}\""
   cp "${SRC_FILE}" "${WF_DIR}"
 done
+
+echo "Copy LaunchAgent/de.die-kriestens.taskpaperdate.plist"
+cp launchd/LaunchAgent/de.die-kriestens.taskpaperdate.plist ~/Library/LaunchAgents/
 
 # vim: ts=2:sw=2:tw=80:fileformat=unix
 # vim: comments& comments+=b\:# formatoptions& formatoptions+=or
