@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>Label</key>
+		<string>de.die-kriestens.taskpaperdaily</string>
+		<key>Disabled</key>
+		<false/>
+		<key>WorkingDirectory</key>
+		<string>/Users/krid/Dropbox/Apps/Alfredv2/Alfred.alfredpreferences/workflows/user.workflow.EA45C547-66B2-481A-9281-DC5C7E906D79</string>
+		<key>ProgramArguments</key>
+		<array>
+			<string>/usr/bin/env</string>
+			<string>python</string>
+			<string>taskpaperdaily.py</string>
+			<string>-v</string>
+			<string>-a</string>
+			<string>.</string>
+		</array>
+		<key>StandardErrorPath</key>
+		<string>/Users/krid/Library/Logs/LaunchAgents/taskpaperdaily.log</string>
+		<key>StandardOutPath</key>
+		<string>/Users/krid/Library/Logs/LaunchAgents/taskpaperdaily.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<!-- run the job 5 Minutes before the full hour -->
+		<key>Minute</key>
+		<integer>55</integer>
+	</dict>
+	</dict>
+</plist>
