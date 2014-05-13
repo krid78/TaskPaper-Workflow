@@ -17,7 +17,7 @@ __logger__ = logging.getLogger(__name__)
 import logging.handlers
 import datetime as dt
 import re
-import runcommand
+import runcommand as rc
 
 __FILES__ = [
     "/Users/krid/Dropbox/_Notes/00-Inbox.taskpaper",
@@ -193,22 +193,27 @@ def main():
     today = dt.datetime.now() #datetime.datetime(2014, 5, 6, 22, 3, 24, 960222)
     #today = dt.date.today()  #datetime.date(2014, 5, 6)
 
+    __logger__.info("Run for %s", today)
+
     ###########################
     # cycle through all files
     #TODO list as argument
     for thefile in __FILES__:
-        cmd = runcommand.RunCommand(["osascript", options.applescriptbase + "/GetNamesOfOpenDocuments.scpt",
-                                     os.path.basename(thefile)])
+        cmd = rc.RunCommand(["osascript", options.applescriptbase + "/GetNamesOfOpenDocuments.scpt", os.path.basename(thefile)])
         cmdres = cmd.run()
         __logger__.debug("Result: %s", cmdres)
-        if len(cmdres) > 0 and cmdres[0] == "false":
+        if cmdres == None:
+            __logger__.info("cdmres of %s is None", cmd)
+        elif len(cmdres) > 0 and cmdres[0] == "false":
             handle_file(thefile, today)
-        else:
+        elif len(cmdres) > 0 and cmdres[0] == "false":
             __logger__.info("File is currently opened in TP")
-            cmd = runcommand.RunCommand(["osascript", options.applescriptbase + "/ParseDueDates.scpt",
-                                         os.path.basename(thefile)])
+            cmd = rc.RunCommand(["osascript", options.applescriptbase + "/ParseDueDates.scpt", os.path.basename(thefile)])
             cmdres = cmd.run()
+        else:
+            __logger__.info("Could not handle result %s of %s", cmdres, cmd)
 
+    __logger__.info("End Run for %s", today)
 
 if __name__ == '__main__':
     main()
