@@ -13,8 +13,10 @@ python/taskpaperdaily.py \
 applescript/GetNamesOfOpenDocuments.scpt \
 applescript/ParseDueDates.scpt"
 
+echo "Using WF: ${WF_DIR}"
 for SRC_FILE in ${SRC_FILES}; do
-  cp -v "${SRC_FILE}" "${WF_DIR}"
+  echo "Copy \"${SRC_FILE##*/}\""
+  cp "${SRC_FILE}" "${WF_DIR}"
 done
 
 # vim: ts=2:sw=2:tw=80:fileformat=unix
