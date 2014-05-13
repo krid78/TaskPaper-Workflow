@@ -205,7 +205,8 @@ def main():
             handle_file(thefile, today)
         else:
             __logger__.info("File is currently opened in TP")
-            cmd = runcommand.RunCommand(["osascript", options.applescriptbase + "/ParseDueDates.scpt", thefile])
+            cmd = runcommand.RunCommand(["osascript", options.applescriptbase + "/ParseDueDates.scpt",
+                                         os.path.basename(thefile)])
             cmdres = cmd.run()
 
 
