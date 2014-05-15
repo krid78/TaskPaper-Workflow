@@ -77,10 +77,9 @@ def handle_project(project, thisday, print_list):
     __logger__.warn("Not implemented, yet")
     return print_list
 
-def handle_task(project, task, thisday, print_list):
+def handle_line(project, task, thisday, print_list):
     """sort the task into tasklist,
     depending on its flags"""
-    assert task['type'] == 'task'
     #TODO handle things like @mail and @error
     __logger__.debug(u"[%s] %s", project, task['text'])
     for key in task['tags'].keys():
@@ -102,7 +101,12 @@ def handle_task(project, task, thisday, print_list):
         print_list['urgent'].append(u"%s»%s [%s] %s"     % (tColor.MAGENTA, tColor.NONE, project, task['text'][:40]))
     elif task['tags'].has_key('created'):
         __logger__.debug(u"created\t[%s] %s", project, task['text'][:40])
-        print_list['outdated'].append(u"%s»%s [%s] %s"   % (tColor.BLUE,    tColor.NONE, project, task['text'][:40]))
+        created = task['tags']['created'].split('-')
+        cdate = dt.date(year=int(created[0]),
+                          month=int(created[1]),
+                          day=int(created[2]))
+        if (thisday.date()-cdate) > dt.timedelta(days=365):
+            print_list['outdated'].append(u"%s»%s [%s] %s"   % (tColor.BLUE,    tColor.NONE, project, task['text'][:40]))
     #elif task['tags'].has_key('due'):
         #__logger__.debug("%s", task['tags']['due'])
 
@@ -128,9 +132,10 @@ def handle_file(file_, thisday, print_list):
 
     for item in tpc:
         if item['type'] == 'project':
+            print_list = handle_line(item['text'], item, thisday, print_list)
             for task in item['chiln']:
                 if tpc[task]['type'] == 'task':
-                    print_list = handle_task(item['text'], tpc[task], thisday, print_list)
+                    print_list = handle_line(item['text'], tpc[task], thisday, print_list)
                 else:
                     __logger__.debug("%s in [%s]: %s", tpc[task]['type'], item['text'], tpc[task]['text'])
 
