@@ -11,6 +11,7 @@ python/open_taskpaper_files.py \
 python/runcommand.py \
 python/taskpaperdate.py \
 python/taskpaperdaily.py \
+python/tp_light_parse_022.py \
 applescript/GetNamesOfOpenDocuments.scpt \
 applescript/ParseDueDates.scpt"
 
@@ -20,9 +21,12 @@ for SRC_FILE in ${SRC_FILES}; do
   cp "${SRC_FILE}" "${WF_DIR}"
 done
 
-echo "Copy LaunchAgent/de.die-kriestens.taskpaperdate.plist"
-cp launchd/LaunchAgent/de.die-kriestens.taskpaperdate.plist ~/Library/LaunchAgents/
-
+md5src=$(md5 launchd/LaunchAgent/de.die-kriestens.taskpaperdate.plist)
+md5dst=$(md5 ~/Library/LaunchAgents/de.die-kriestens.taskpaperdate.plist)
+if [[ md5src != md5dst ]]; then
+  echo "Copy LaunchAgent/de.die-kriestens.taskpaperdate.plist"
+  cp launchd/LaunchAgent/de.die-kriestens.taskpaperdate.plist ~/Library/LaunchAgents/
+fi
 # vim: ts=2:sw=2:tw=80:fileformat=unix
 # vim: comments& comments+=b\:# formatoptions& formatoptions+=or
 
