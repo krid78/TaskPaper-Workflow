@@ -16,6 +16,8 @@ import datetime as dt
 import logging
 __logger__ = logging.getLogger(__name__)
 import logging.handlers
+
+# TODO there is a bog in the parser, which handles sinle word projects incorrect
 import tp_light_parse_022 as tplp
 
 __FILES__ = [
@@ -70,6 +72,10 @@ class bgColor:
     bCYAN    = "\x1b[46;1m"
     bWHITE   = "\x1b[47;1m"
     NONE     = "\x1b[0m"
+
+def handle_project(project, thisday, print_list):
+    __logger__.warn("Not implemented, yet")
+    return print_list
 
 def handle_task(project, task, thisday, print_list):
     """sort the task into tasklist,
@@ -133,33 +139,33 @@ def handle_file(file_, thisday, print_list):
 def print_list_items(list):
     """print the items of a list"""
     for item in list:
-        sys.stdout.write("%s\n" % (item))
+        sys.stdout.write("%s\n" % (item.encode('utf-8')))
 
 def print_lists(print_list):
     """print the lists"""
 
     if len(print_list['today']) > 0:
-        sys.stdout.write("%sTODAY%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        sys.stdout.write(u"%sTODAY%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['today'])
 
     if len(print_list['tomorrow']) > 0:
-        sys.stdout.write("%sTOMORROW%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        sys.stdout.write(u"%sTOMORROW%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['tomorrow'])
 
     if len(print_list['overdue']) > 0:
-        sys.stdout.write("%sOVERDUE%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        sys.stdout.write(u"%sOVERDUE%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['overdue'])
 
     if len(print_list['urgent']) > 0:
-        sys.stdout.write("%sURGENT%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        sys.stdout.write(u"%sURGENT%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['urgent'])
 
     if len(print_list['upcomming']) > 0:
-        sys.stdout.write("%sUPCOMING%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        sys.stdout.write(u"%sUPCOMING%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['upcomming'])
 
     if len(print_list['outdated']) > 0:
-        sys.stdout.write("%sOUTDATED%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        sys.stdout.write(u"%sOUTDATED%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['outdated'])
 
 def main():
