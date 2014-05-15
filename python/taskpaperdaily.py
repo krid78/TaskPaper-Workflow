@@ -112,6 +112,11 @@ def handle_line(project, task, thisday, print_list):
 
     return print_list
 
+def handle_task():
+    if len(item['chiln']) > 0:
+        handle_task()
+    #...
+    pass
 
 def handle_file(file_, thisday, print_list):
     """handle one file"""
@@ -130,12 +135,16 @@ def handle_file(file_, thisday, print_list):
 
     tpc = tplp.get_tp_parse(contents)
 
+    # TODO task can have chiln as well -> recursive?!
     for item in tpc:
         if item['type'] == 'project':
             print_list = handle_line(item['text'], item, thisday, print_list)
             for task in item['chiln']:
                 if tpc[task]['type'] == 'task':
                     print_list = handle_line(item['text'], tpc[task], thisday, print_list)
+                    #FIXME really dirty hack
+                    for subtask in tpc[task]['chiln']:
+                        print_list = handle_line(item['text'], tpc[subtask], thisday, print_list)
                 else:
                     __logger__.debug("%s in [%s]: %s", tpc[task]['type'], item['text'], tpc[task]['text'])
 
