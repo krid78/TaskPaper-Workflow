@@ -149,22 +149,27 @@ def print_lists(print_list):
         print_list_items(print_list['today'])
 
     if len(print_list['tomorrow']) > 0:
+        sys.stdout.write("\n")
         sys.stdout.write(u"%sTOMORROW%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['tomorrow'])
 
     if len(print_list['overdue']) > 0:
+        sys.stdout.write("\n")
         sys.stdout.write(u"%sOVERDUE%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['overdue'])
 
     if len(print_list['urgent']) > 0:
+        sys.stdout.write("\n")
         sys.stdout.write(u"%sURGENT%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['urgent'])
 
     if len(print_list['upcomming']) > 0:
+        sys.stdout.write("\n")
         sys.stdout.write(u"%sUPCOMING%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['upcomming'])
 
     if len(print_list['outdated']) > 0:
+        sys.stdout.write("\n")
         sys.stdout.write(u"%sOUTDATED%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
         print_list_items(print_list['outdated'])
 
