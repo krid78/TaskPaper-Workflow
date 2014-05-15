@@ -5,6 +5,18 @@
 # Creation Date :  Mo 12 Mai 00:14:07 2014
 ########################################################################
 
+function copy_file()
+{
+  local src=${1}
+  local dst=${2}
+  md5src=$(md5 -q ${src})
+  md5dst=$(md5 -q ${dst})
+  if [[ "${md5src}" != "${md5dst}" ]]; then
+    echo "Copy ${src} to ${dst}"
+    cp "${src}" "${dst}"
+  fi
+}
+
 WF_DIR=/Users/krid/Dropbox/Apps/Alfredv2/Alfred.alfredpreferences/workflows/user.workflow.EA45C547-66B2-481A-9281-DC5C7E906D79
 SRC_FILES="python/feedback.py \
 python/open_taskpaper_files.py \
@@ -17,16 +29,12 @@ applescript/ParseDueDates.scpt"
 
 echo "Using WF: ${WF_DIR}"
 for SRC_FILE in ${SRC_FILES}; do
-  echo "Copy \"${SRC_FILE##*/}\""
-  cp "${SRC_FILE}" "${WF_DIR}"
+  DST_FILE="${SRC_FILE##*/}"
+  copy_file "${SRC_FILE}" "${WF_DIR}/${DST_FILE}"
 done
 
-md5src=$(md5 launchd/LaunchAgent/de.die-kriestens.taskpaperdate.plist)
-md5dst=$(md5 ~/Library/LaunchAgents/de.die-kriestens.taskpaperdate.plist)
-if [[ md5src != md5dst ]]; then
-  echo "Copy LaunchAgent/de.die-kriestens.taskpaperdate.plist"
-  cp launchd/LaunchAgent/de.die-kriestens.taskpaperdate.plist ~/Library/LaunchAgents/
-fi
+copy_file launchd/LaunchAgent/de.die-kriestens.taskpaperdate.plist ~/Library/LaunchAgents/de.die-kriestens.taskpaperdate.plist
+
 # vim: ts=2:sw=2:tw=80:fileformat=unix
 # vim: comments& comments+=b\:# formatoptions& formatoptions+=or
 
