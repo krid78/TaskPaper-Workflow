@@ -16,6 +16,7 @@ import datetime as dt
 import logging
 __logger__ = logging.getLogger(__name__)
 import logging.handlers
+import tp_light_parse_022 as tplp
 
 __FILES__ = [
     "/Users/krid/Dropbox/_Notes/00-Inbox.taskpaper",
@@ -25,11 +26,12 @@ __FILES__ = [
     "/Users/krid/Dropbox/_Notes/40-Studenten.taskpaper",
     "/Users/krid/Dropbox/_Notes/50-Geschenke.taskpaper",
     "/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
+#   "/Users/krid/Develop/taskpaper/myTaskPaperWorkflow/python/smalltest.taskpaper"
 ]
 
-# we only need flat colors 30 .. 37
+# flat colors 30 .. 37
 # bold is <color>;1, eg 30;1
-# and con bg means 4x
+# and bg means 4x
 class tColor:
     """colored text"""
     BLACK    = "\x1b[30m"
@@ -70,29 +72,94 @@ class bgColor:
     bWHITE   = "\x1b[47;1m"
     NONE     = "\x1b[0m"
 
-def handle_file(file_, thisday, overdue, today, upcomming, outdated):
+def handle_task(project, task, thisday, print_list):
+    """sort the task into tasklist,
+    depending on its flags"""
+    if task['type'] == 'project':
+        return print_list
+    #TODO handle things like @mail and @error
+    __logger__.debug(u"[%s] %s", project, task['text'])
+    if task['tags'].has_key('today'):
+        __logger__.debug(u"today:\t[%s] %s", project, task['text'][:40])
+        print_list['today'].append(u"%s»%s [%s] %s"      % (tColor.GREEN,   tColor.NONE, project, task['text'][:40]))
+    elif task['tags'].has_key('tomorrow'):
+        __logger__.debug(u"tomorrow:\t[%s] %s", project, task['text'][:40])
+        print_list['tomorrow'].append(u"%s»%s [%s] %s"   % (tColor.CYAN,    tColor.NONE, project, task['text'][:40]))
+    elif task['tags'].has_key('overdue'):
+        __logger__.debug(u"overdue:\t[%s] %s", project, task['text'][:40])
+        print_list['overdue'].append(u"%s»%s [%s] %s"    % (tColor.RED,     tColor.NONE, project, task['text'][:40]))
+    elif task['tags'].has_key('upcommming'):
+        __logger__.debug(u"upcommming:\t[%s] %s", project, task['text'][:40])
+        print_list['upcommming'].append(u"%s»%s [%s] %s" % (tColor.NONE,    tColor.NONE, project, task['text'][:40]))
+    elif task['tags'].has_key('urgent'):
+        __logger__.debug(u"urgent:\t[%s] %s", project, task['text'][:40])
+        print_list['urgent'].append(u"%s»%s [%s] %s"     % (tColor.MAGENTA, tColor.NONE, project, task['text'][:40]))
+    elif task['tags'].has_key('created'):
+        __logger__.debug(u"created\t[%s] %s", project, task['text'][:40])
+        print_list['outdated'].append(u"%s»%s [%s] %s"   % (tColor.BLUE,    tColor.NONE, project, task['text'][:40]))
+    #elif task['tags'].has_key('due'):
+        #__logger__.debug("%s", task['tags']['due'])
+
+    return print_list
+
+
+def handle_file(file_, thisday, print_list):
     """handle one file"""
+
+    contents = ""
+
+    # first read in file stripping empty lines
     with codecs.open(file_, "r", 'utf8') as myfile:
-        contents = myfile.readlines()
+        contents = myfile.read()
 
-    __logger__.debug("Read %s", file_)
-
+    # stop here if file is empty
     if contents == '':
         return 0
 
-def print_lists(overdue, today, upcomming, outdated):
+    __logger__.debug("Read %s", file_)
 
-    if len(today) > 0:
+    tpc = tplp.get_tp_parse(contents)
+
+    for item in tpc:
+        if item['type'] == 'project':
+            for task in item['chiln']:
+                print_list = handle_task(item['text'], tpc[task], thisday, print_list)
+        else:
+            continue
+
+    return print_list
+
+def print_list_items(list):
+    """print the items of a list"""
+    for item in list:
+        sys.stdout.write("%s\n" % (item))
+
+def print_lists(print_list):
+    """print the lists"""
+
+    if len(print_list['today']) > 0:
         sys.stdout.write("%sTODAY%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        print_list_items(print_list['today'])
 
-    if len(overdue) > 0:
+    if len(print_list['tomorrow']) > 0:
+        sys.stdout.write("%sTOMORROW%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        print_list_items(print_list['tomorrow'])
+
+    if len(print_list['overdue']) > 0:
         sys.stdout.write("%sOVERDUE%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        print_list_items(print_list['overdue'])
 
-    if len(upcomming) > 0:
+    if len(print_list['urgent']) > 0:
+        sys.stdout.write("%sURGENT%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        print_list_items(print_list['urgent'])
+
+    if len(print_list['upcomming']) > 0:
         sys.stdout.write("%sUPCOMING%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        print_list_items(print_list['upcomming'])
 
-    if len(outdated) > 0:
+    if len(print_list['outdated']) > 0:
         sys.stdout.write("%sOUTDATED%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        print_list_items(print_list['outdated'])
 
 def main():
     """the working cow"""
@@ -143,17 +210,23 @@ def main():
 
     __logger__.info("Run for %s", thisday)
 
-    overdue   = ["1"]
-    today     = ["2"]
-    upcomming = ["3"]
-    outdated  = ["4"]
+    ###########################
+    # initialize list of tasks
+    print_list = {
+        'today'     : [],
+        'tomorrow'  : [],
+        'overdue'   : [],
+        'upcomming' : [],
+        'urgent'    : [],
+        'outdated'  : [],
+    }
 
     ###########################
     # cycle through all files
     for thefile in __FILES__:
-        handle_file(thefile, thisday, overdue, today, upcomming, outdated)
+        print_list = handle_file(thefile, thisday, print_list)
 
-    print_lists(overdue, today, upcomming, outdated)
+    print_lists(print_list)
 
     __logger__.info("End Run for %s", thisday)
 
