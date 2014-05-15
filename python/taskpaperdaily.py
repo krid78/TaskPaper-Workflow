@@ -22,11 +22,10 @@ __FILES__ = [
     "/Users/krid/Dropbox/_Notes/00-Inbox.taskpaper",
     "/Users/krid/Dropbox/_Notes/10-Work.taskpaper",
     "/Users/krid/Dropbox/_Notes/20-Home.taskpaper",
-    "/Users/krid/Dropbox/_Notes/30-doing.taskpaper",
+#   "/Users/krid/Dropbox/_Notes/30-doing.taskpaper",
     "/Users/krid/Dropbox/_Notes/40-Studenten.taskpaper",
     "/Users/krid/Dropbox/_Notes/50-Geschenke.taskpaper",
-    "/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
-#   "/Users/krid/Develop/taskpaper/myTaskPaperWorkflow/python/smalltest.taskpaper"
+#   "/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
 ]
 
 # flat colors 30 .. 37
@@ -75,10 +74,11 @@ class bgColor:
 def handle_task(project, task, thisday, print_list):
     """sort the task into tasklist,
     depending on its flags"""
-    if task['type'] == 'project':
-        return print_list
+    assert task['type'] == 'task'
     #TODO handle things like @mail and @error
     __logger__.debug(u"[%s] %s", project, task['text'])
+    for key in task['tags'].keys():
+        __logger__.debug(u"\tkey: %s",key)
     if task['tags'].has_key('today'):
         __logger__.debug(u"today:\t[%s] %s", project, task['text'][:40])
         print_list['today'].append(u"%s»%s [%s] %s"      % (tColor.GREEN,   tColor.NONE, project, task['text'][:40]))
@@ -123,9 +123,10 @@ def handle_file(file_, thisday, print_list):
     for item in tpc:
         if item['type'] == 'project':
             for task in item['chiln']:
-                print_list = handle_task(item['text'], tpc[task], thisday, print_list)
-        else:
-            continue
+                if tpc[task]['type'] == 'task':
+                    print_list = handle_task(item['text'], tpc[task], thisday, print_list)
+                else:
+                    __logger__.debug("%s in [%s]: %s", tpc[task]['type'], item['text'], tpc[task]['text'])
 
     return print_list
 
