@@ -7,6 +7,30 @@ Email         :  daniel.kriesten@etit.tu-chemnitz.de
 Creation Date :  Di 13 Mai 21:29:00 2014
 
 A script to filter taskpaper files for actual tasks
+
+TODO:
+Umstelle auf eine Klasse
+class printTP:
+    def __init__(self):
+        # anlegen der listen
+        pass
+
+    def _handle_task(self, task):
+        # geht rekursiv durch alle kinder
+        pass
+
+    def _handle_item(self, item):
+        #ruft ggf. handle_task
+        pass
+
+    def handle_tp_list(self, tp_list):
+        # ruft den tp_light_parse_022
+        # ruft dann _handle_item
+        pass
+
+    def __str__(self):
+        # formatiert die Listen zur Ausgabe
+        pass
 """
 
 import sys
@@ -17,7 +41,7 @@ import logging
 __logger__ = logging.getLogger(__name__)
 import logging.handlers
 
-# TODO there is a bog in the parser, which handles sinle word projects incorrect
+#FIXME there seems to be a bug in the parser, which handles sinle word projects incorrect
 import tp_light_parse_022 as tplp
 
 __FILES__ = [
@@ -73,10 +97,6 @@ class bgColor:
     bWHITE   = "\x1b[47;1m"
     NONE     = "\x1b[0m"
 
-def handle_project(project, thisday, print_list):
-    __logger__.warn("Not implemented, yet")
-    return print_list
-
 def handle_line(project, task, thisday, print_list):
     """sort the task into tasklist,
     depending on its flags"""
@@ -112,11 +132,15 @@ def handle_line(project, task, thisday, print_list):
 
     return print_list
 
-def handle_task():
-    if len(item['chiln']) > 0:
-        handle_task()
-    #...
-    pass
+def handle_task(project, item, thisday, print_list):
+    """handels a task-item and it's subitems"""
+    __logger__.debug("Handle: %s", item['text'])
+    if item['type'] == 'task':
+        print_list = handle_line(project, item, thisday, print_list)
+    for subitem in item['chiln']:
+        print_list = handle_task(project, subitem, thisday, print_list)
+    return print_list
+
 
 def handle_file(file_, thisday, print_list):
     """handle one file"""
