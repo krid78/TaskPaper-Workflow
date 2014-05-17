@@ -21,10 +21,12 @@ import feedback
 __TP_BASEDIR__ = "/Users/krid/Dropbox/_Notes"
 __TP_EXTENSION__ = "taskpaper"
 
-def find_files(basedir, extension):
+def find_files(basedir, extension, filter=""):
     """create a list of tp files"""
     command = ["mdfind", "-onlyin", basedir, "kMDItemFSName==*." + extension]
     __logger__.debug(command)
+    filter = basedir + "/" + filter
+    __logger__.debug("Filter: %s", filter)
     # simple call to run a system process
     cmd = runcommand.RunCommand(command)
     file_list = cmd.run()
@@ -32,9 +34,8 @@ def find_files(basedir, extension):
     if file_list != None:
         __logger__.debug(file_list)
         for file_ in sorted(file_list):
-            atree.add_item(file_,
-                        subtitle="Open " + file_ + "in TaskPaper",
-                        arg=file_)
+            if file_.startswith(filter):
+                atree.add_item(file_, subtitle="Open " + file_ + "in TaskPaper", arg=file_)
     __logger__.info(atree)
     alfred_xml = repr(atree)
     return alfred_xml
@@ -66,6 +67,10 @@ def main():
                         "--extension",
                         default=__TP_EXTENSION__,
                         help="default file extension")
+    parser.add_argument("-f",
+                        "--filter",
+                        default="",
+                        help="filter results")
     (options, args) = parser.parse_known_args()
 
     ######################
@@ -83,7 +88,7 @@ def main():
     logger.addHandler(handler)
 
     # run the working task
-    ret = find_files(options.basedir.replace(" ", "\ "), options.extension)
+    ret = find_files(options.basedir.replace(" ", "\ "), options.extension, options.filter)
     if ret != None:
         sys.stdout.write(ret)
 
