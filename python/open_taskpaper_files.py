@@ -23,10 +23,8 @@ __TP_EXTENSION__ = "taskpaper"
 
 def find_files(basedir, extension, filter=""):
     """create a list of tp files"""
-    command = ["mdfind", "-onlyin", basedir, "kMDItemFSName==*." + extension]
+    command = ["mdfind", "-onlyin", basedir, "kMDItemFSName==" + filter + "*." + extension]
     __logger__.debug(command)
-    filter = basedir + "/" + filter
-    __logger__.debug("Filter: %s", filter)
     # simple call to run a system process
     cmd = runcommand.RunCommand(command)
     file_list = cmd.run()
@@ -34,8 +32,7 @@ def find_files(basedir, extension, filter=""):
     if file_list != None:
         __logger__.debug(file_list)
         for file_ in sorted(file_list):
-            if file_.startswith(filter):
-                atree.add_item(file_, subtitle="Open " + file_ + "in TaskPaper", arg=file_)
+            atree.add_item(file_, subtitle="Open " + file_ + "in TaskPaper", arg=file_)
     __logger__.info(atree)
     alfred_xml = repr(atree)
     return alfred_xml
