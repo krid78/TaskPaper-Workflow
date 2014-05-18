@@ -31,7 +31,8 @@ __FILES__ = [
 
 __WEEKDAYS__ = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 __REGEX_WEEKNUMBERS__ = r'@due\(kw([1-9]|[0-4][0-9]|5[0-3])\)'
-__REGEX_DUE_DATES__ = r'@due\((\d{4})-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])\)'
+__REGEX_DUE_DATES__   = r'@due\((\d{4})-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])\)'
+__REGEX_REMINDERS__ = r'@remind\(((?:\d{4})-(?:0[1-9]|1[0-2])-(?:[0-2][0-9]|3[0-1]))\s*((?:[0-1][0-9]|2[0-4]):(?:[0-5][0-9]))*\)'
 
 def calc_times(today):
     """calculate some day and time values"""
@@ -81,7 +82,33 @@ def handle_week(line, today, tomorrow, week, thisweek):
 
     return line
 
-def handle_file(file_, today):
+def handle_reminder(line, date, time, applescriptbase):
+    """ handle reminder """
+    command_list = ["osascript", applescriptbase + "/CreateReminder.scpt"]
+
+    begin = 0
+    if "- " in line:
+        begin = line.find("- ")+2
+
+    end = line.find(" @")
+    text = line[begin:end]
+    __logger__.debug("Text: %s", text)
+    command_list.append("\"%s\"" % (text[:20]))
+    command_list.append("\"%s\"" % (text))
+    command_list.append("Inbox")
+    command_list.append(date)
+    if time != None:
+        command_list.append(time)
+
+    cmd = rc.RunCommand(command_list)
+
+    __logger__.debug("%s", cmd)
+
+    cmdres = cmd.run()
+
+    return line.replace(" @remind", " @reminded")
+
+def handle_file(file_, today, applescriptbase):
     """handle one file"""
     with codecs.open(file_, "r", 'utf8') as myfile:
         contents = myfile.readlines()
@@ -92,6 +119,7 @@ def handle_file(file_, today):
     tomorrow, thisweek, weekdays = calc_times(today)
     regex_due  = re.compile(__REGEX_DUE_DATES__)
     regex_week = re.compile(__REGEX_WEEKNUMBERS__)
+    regex_reminder = re.compile(__REGEX_REMINDERS__)
 
     if contents[0].startswith("Last run at"):
         firstline = 1
@@ -138,6 +166,13 @@ def handle_file(file_, today):
             week = int(week_match.group(1))
             __logger__.debug("Found week: %d", week)
             line = handle_week(line, today, tomorrow, week, thisweek)
+
+        reminder_match = regex_reminder.search(line)
+        if reminder_match != None:
+            __logger__.debug("Found Reminder: %s", reminder_match.groups())
+            date = reminder_match.group(1)
+            time = reminder_match.group(2)
+            line = handle_reminder(line, date, time, applescriptbase)
 
         output += line
 
@@ -207,7 +242,7 @@ def main():
         if cmdres == None:
             __logger__.info("cdmres of %s is None", cmd)
         elif len(cmdres) > 0 and cmdres[0] == "false":
-            handle_file(thefile, today)
+            handle_file(thefile, today, options.applescriptbase)
         elif len(cmdres) > 0 and cmdres[0] == "true":
             __logger__.info("File %s is currently opened in TP" % (os.path.basename(thefile)))
             cmd = rc.RunCommand(["osascript", options.applescriptbase + "/ParseDueDates.scpt", os.path.basename(thefile)])
