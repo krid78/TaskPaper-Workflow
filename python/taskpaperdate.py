@@ -76,7 +76,7 @@ def handle_week(line, today, tomorrow, week, thisweek):
         line += " @today"
     elif thisweek > week:
         line += " @overdue"
-    elif thisweek+1 == tomorrow_week:
+    elif week+1 == tomorrow_week:
         line += " @tomorrow"
 
     return line
