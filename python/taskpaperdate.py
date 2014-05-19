@@ -106,6 +106,10 @@ def handle_reminder(line, date, time, applescriptbase):
 
     cmdres = cmd.run()
 
+    if cmdres == None:
+        __logger__.warn("None-Result: %s", cmd)
+        return line
+
     return line.replace(" @remind", " @reminded")
 
 def handle_file(file_, today, applescriptbase):
