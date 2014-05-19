@@ -18,10 +18,25 @@ There is a number of keywords.
 * .to
 * .tm
 * .ts
-* 
+*
 
 ## Credits
 
-* feedback.py: Peter Okma
+ * [Gianni Rondini](http://dropbyte.tumblr.com)
+  * Inspired me with his [Alfred and TaskPaper workflow](http://dropbyte.tumblr.com/post/21794666472/taskpaper-meets-alfred-update-2-1)
+ * www.hogbaysoftware.com
+  * [DueDates](http://www.hogbaysoftware.com/wiki/DueDates) as base for ParseDueDates.scpt
+* ??
+  * TaskPaper-Parser
+* Peter Okma
+  * feedback.py
+ * Bruce Phillips
+  * [trim](http://macscripter.net/viewtopic.php?id=18519)
+* macosxautomation.com (Athor unknown to me)
+  * [trim_line](http://www.macosxautomation.com/applescript/sbrt/sbrt-06.html)
 
 ## Author
+
+## TODO
+ParseDueDates.scpt:
+	- handle or ignore kwXY-Tags
