@@ -144,7 +144,9 @@ def handle_file(file_, today, applescriptbase):
 
         # if the project is done, remove relative dates
         if '@done' in line:
-            output += clear_relatives(line)
+            line = line.replace("@urgent", "")
+            line = clear_relatives(line)
+            output += line
             continue
 
         # if we have a due, we will recalculate the relative date form it
