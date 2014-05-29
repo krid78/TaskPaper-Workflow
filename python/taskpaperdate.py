@@ -56,6 +56,7 @@ def clear_relatives(line):
     line = line.replace(" @overdue", "")
     # TODO tjis is a hack
     line = line.replace(" @error(Unknown value for due tag)", "")
+    # __logger__.debug("Cleared: %s", line)
     return line
 
 def change_dates(line, thedate, today, tomorrow):
@@ -146,6 +147,7 @@ def handle_file(file_, today, applescriptbase):
         if '@done' in line:
             line = line.replace("@urgent", "")
             line = clear_relatives(line)
+            __logger__.debug("DoneLine: %s", line)
             output += line
             continue
 
