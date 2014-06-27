@@ -54,7 +54,7 @@ def clear_relatives(line):
     line = line.replace(" @today", "")
     line = line.replace(" @tomorrow", "")
     line = line.replace(" @overdue", "")
-    # TODO tjis is a hack
+    # TODO this is a hack
     line = line.replace(" @error(Unknown value for due tag)", "")
     # __logger__.debug("Cleared: %s", line)
     return line
