@@ -8,7 +8,7 @@
 #
 
 export LANG="de_DE"
-LC_ALL="de_DE.UTF-8"
+export LC_ALL="de_DE.UTF-8"
 DOING="/Users/krid/Dropbox/_Notes/30-doing.taskpaper"
 DATERES=$(date +"%a, %F;%R")
 DATE="${DATERES%;*}:"
