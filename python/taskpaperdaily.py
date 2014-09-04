@@ -48,54 +48,57 @@ __FILES__ = [
     "/Users/krid/Dropbox/_Notes/00-Inbox.taskpaper",
     "/Users/krid/Dropbox/_Notes/10-Work.taskpaper",
     "/Users/krid/Dropbox/_Notes/20-Home.taskpaper",
-#   "/Users/krid/Dropbox/_Notes/30-doing.taskpaper",
+    #"/Users/krid/Dropbox/_Notes/30-doing.taskpaper",
     "/Users/krid/Dropbox/_Notes/40-Studenten.taskpaper",
     "/Users/krid/Dropbox/_Notes/50-Geschenke.taskpaper",
-#   "/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
+    #"/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
 ]
 
 # flat colors 30 .. 37
 # bold is <color>;1, eg 30;1
 # and bg means 4x
-class tColor:
+class TxtColor(object):
     """colored text"""
-    BLACK    = "\x1b[30m"
-    RED      = "\x1b[31m"
-    GREEN    = "\x1b[32m"
-    YELLOW   = "\x1b[33m"
-    BLUE     = "\x1b[34m"
-    MAGENTA  = "\x1b[35m"
-    CYAN     = "\x1b[36m"
-    WHITE    = "\x1b[37m"
-    bBLACK   = "\x1b[30;1m"
-    bRED     = "\x1b[31;1m"
-    bGREEN   = "\x1b[32;1m"
-    bYELLOW  = "\x1b[33;1m"
-    bBLUE    = "\x1b[34;1m"
+    BLACK = "\x1b[30m"
+    RED = "\x1b[31m"
+    GREEN = "\x1b[32m"
+    YELLOW = "\x1b[33m"
+    BLUE = "\x1b[34m"
+    MAGENTA = "\x1b[35m"
+    CYAN = "\x1b[36m"
+    WHITE = "\x1b[37m"
+    bBLACK = "\x1b[30;1m"
+    bRED = "\x1b[31;1m"
+    bGREEN = "\x1b[32;1m"
+    bYELLOW = "\x1b[33;1m"
+    bBLUE = "\x1b[34;1m"
     bMAGENTA = "\x1b[35;1m"
-    bCYAN    = "\x1b[36;1m"
-    bWHITE   = "\x1b[37;1m"
-    NONE     = "\x1b[0m"
+    bCYAN = "\x1b[36;1m"
+    bWHITE = "\x1b[37;1m"
+    NONE = "\x1b[0m"
 
-class bgColor:
+class TxtBgColor(object):
     """colored background"""
-    BLACK    = "\x1b[40m"
-    RED      = "\x1b[41m"
-    GREEN    = "\x1b[42m"
-    YELLOW   = "\x1b[43m"
-    BLUE     = "\x1b[44m"
-    MAGENTA  = "\x1b[45m"
-    CYAN     = "\x1b[46m"
-    WHITE    = "\x1b[47m"
-    bBLACK   = "\x1b[40;1m"
-    bRED     = "\x1b[41;1m"
-    bGREEN   = "\x1b[42;1m"
-    bYELLOW  = "\x1b[43;1m"
-    bBLUE    = "\x1b[44;1m"
+    BLACK = "\x1b[40m"
+    RED = "\x1b[41m"
+    GREEN = "\x1b[42m"
+    YELLOW = "\x1b[43m"
+    BLUE = "\x1b[44m"
+    MAGENTA = "\x1b[45m"
+    CYAN = "\x1b[46m"
+    WHITE = "\x1b[47m"
+    bBLACK = "\x1b[40;1m"
+    bRED = "\x1b[41;1m"
+    bGREEN = "\x1b[42;1m"
+    bYELLOW = "\x1b[43;1m"
+    bBLUE = "\x1b[44;1m"
     bMAGENTA = "\x1b[45;1m"
-    bCYAN    = "\x1b[46;1m"
-    bWHITE   = "\x1b[47;1m"
-    NONE     = "\x1b[0m"
+    bCYAN = "\x1b[46;1m"
+    bWHITE = "\x1b[47;1m"
+    NONE = "\x1b[0m"
+
+    def __init__(self):
+        pass
 
 def handle_line(project, task, thisday, print_list):
     """sort the task into tasklist,
@@ -103,30 +106,33 @@ def handle_line(project, task, thisday, print_list):
     #TODO handle things like @mail and @error
     __logger__.debug(u"[%s] %s", project, task['text'])
     for key in task['tags'].keys():
-        __logger__.debug(u"\tkey: %s",key)
+        __logger__.debug(u"\tkey: %s", key)
     if task['tags'].has_key('today'):
         __logger__.debug(u"today:\t[%s] %s", project, task['text'][:40])
-        print_list['today'].append(u"%s»%s [%s] %s"      % (tColor.GREEN,   tColor.NONE, project, task['text'][:40]))
+        print_list['today'].append(u"%s»%s [%s] %s" % (TxtColor.GREEN, TxtColor.NONE, project, task['text'][:40]))
     elif task['tags'].has_key('tomorrow'):
         __logger__.debug(u"tomorrow:\t[%s] %s", project, task['text'][:40])
-        print_list['tomorrow'].append(u"%s»%s [%s] %s"   % (tColor.CYAN,    tColor.NONE, project, task['text'][:40]))
+        print_list['tomorrow'].append(u"%s»%s [%s] %s" % (TxtColor.CYAN, TxtColor.NONE, project, task['text'][:40]))
     elif task['tags'].has_key('overdue'):
         __logger__.debug(u"overdue:\t[%s] %s", project, task['text'][:40])
-        print_list['overdue'].append(u"%s»%s [%s] %s"    % (tColor.RED,     tColor.NONE, project, task['text'][:40]))
+        print_list['overdue'].append(u"%s»%s [%s] %s" % (TxtColor.RED, TxtColor.NONE, project, task['text'][:40]))
     elif task['tags'].has_key('upcommming'):
         __logger__.debug(u"upcommming:\t[%s] %s", project, task['text'][:40])
-        print_list['upcommming'].append(u"%s»%s [%s] %s" % (tColor.NONE,    tColor.NONE, project, task['text'][:40]))
+        print_list['upcommming'].append(u"%s»%s [%s] %s" % (TxtColor.NONE, TxtColor.NONE, project, task['text'][:40]))
     elif task['tags'].has_key('urgent'):
         __logger__.debug(u"urgent:\t[%s] %s", project, task['text'][:40])
-        print_list['urgent'].append(u"%s»%s [%s] %s"     % (tColor.MAGENTA, tColor.NONE, project, task['text'][:40]))
+        print_list['urgent'].append(u"%s»%s [%s] %s" % (TxtColor.MAGENTA, TxtColor.NONE, project, task['text'][:40]))
+    elif task['tags'].has_key('someday'):
+        __logger__.debug(u"someday:\t[%s] %s", project, task['text'][:40])
+        print_list['someday'].append(u"» [%s] %s" % (project, task['text'][:40]))
     elif task['tags'].has_key('created'):
         __logger__.debug(u"created\t[%s] %s", project, task['text'][:40])
         created = task['tags']['created'].split('-')
         cdate = dt.date(year=int(created[0]),
-                          month=int(created[1]),
-                          day=int(created[2]))
+                        month=int(created[1]),
+                        day=int(created[2]))
         if (thisday.date()-cdate) > dt.timedelta(days=365):
-            print_list['outdated'].append(u"%s»%s [%s] %s"   % (tColor.BLUE,    tColor.NONE, project, task['text'][:40]))
+            print_list['outdated'].append(u"%s»%s [%s] %s" % (TxtColor.BLUE, TxtColor.NONE, project, task['text'][:40]))
     #elif task['tags'].has_key('due'):
         #__logger__.debug("%s", task['tags']['due'])
 
@@ -174,49 +180,58 @@ def handle_file(file_, thisday, print_list):
 
     return print_list
 
-def print_list_items(list):
+def print_list_items(list_, count_max=3):
     """print the items of a list"""
-    for item in list:
+    count = 0
+    for item in list_:
         sys.stdout.write("%s\n" % (item.encode('utf-8')))
+        count += 1
+        if count >= count_max:
+            break
 
 def print_lists(print_list):
     """print the lists"""
 
     if len(print_list['today']) > 0:
-        sys.stdout.write(u"%sTODAY%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
-        print_list_items(print_list['today'])
+        sys.stdout.write(u"%sTODAY%s\n--------------------\n" % (TxtColor.bWHITE, TxtColor.NONE))
+        print_list_items(print_list['today'], 5)
 
     if len(print_list['tomorrow']) > 0:
         sys.stdout.write("\n")
-        sys.stdout.write(u"%sTOMORROW%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        sys.stdout.write(u"%sTOMORROW%s\n--------------------\n" % (TxtColor.bWHITE, TxtColor.NONE))
         print_list_items(print_list['tomorrow'])
 
     if len(print_list['overdue']) > 0:
         sys.stdout.write("\n")
-        sys.stdout.write(u"%sOVERDUE%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
-        print_list_items(print_list['overdue'])
+        sys.stdout.write(u"%sOVERDUE%s\n--------------------\n" % (TxtColor.bWHITE, TxtColor.NONE))
+        print_list_items(print_list['overdue'], 5)
 
     if len(print_list['urgent']) > 0:
         sys.stdout.write("\n")
-        sys.stdout.write(u"%sURGENT%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        sys.stdout.write(u"%sURGENT%s\n--------------------\n" % (TxtColor.bWHITE, TxtColor.NONE))
         print_list_items(print_list['urgent'])
 
     if len(print_list['upcomming']) > 0:
         sys.stdout.write("\n")
-        sys.stdout.write(u"%sUPCOMING%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        sys.stdout.write(u"%sUPCOMING%s\n--------------------\n" % (TxtColor.bWHITE, TxtColor.NONE))
         print_list_items(print_list['upcomming'])
 
     if len(print_list['outdated']) > 0:
         sys.stdout.write("\n")
-        sys.stdout.write(u"%sOUTDATED%s\n--------------------\n" % (tColor.bWHITE, tColor.NONE))
+        sys.stdout.write(u"%sOUTDATED%s\n--------------------\n" % (TxtColor.bWHITE, TxtColor.NONE))
         print_list_items(print_list['outdated'])
+
+    if len(print_list['someday']) > 0:
+        sys.stdout.write("\n")
+        sys.stdout.write(u"%sSOMEDAY%s\n--------------------\n" % (TxtColor.bWHITE, TxtColor.NONE))
+        print_list_items(print_list['someday'])
 
 def main():
     """the working cow"""
 
     # some arguments to care fore
     parser = argparse.ArgumentParser(
-        description=u"Convert relative to absolute dates in TaskPaper",
+        description=u"Print TaskPaper Tasks sorted by some date-dependent rules",
         epilog=u"Tested with TaskPaper v2",
         conflict_handler="resolve")
     parser.add_argument("--version", action="version", version="%(prog)s 0.1")
@@ -231,10 +246,6 @@ def main():
                         default=False,
                         action="store_true",
                         help="do debugging to stderr")
-    parser.add_argument("-a",
-                        "--applescriptbase",
-                        default=".",
-                        help="the base path for the apple scripts")
 
     (options, args) = parser.parse_known_args()
 
@@ -269,6 +280,7 @@ def main():
         'upcomming' : [],
         'urgent'    : [],
         'outdated'  : [],
+        'someday'   : [],
     }
 
     ###########################
