@@ -23,15 +23,15 @@ __FILES__ = [
     "/Users/krid/Dropbox/_Notes/00-Inbox.taskpaper",
     "/Users/krid/Dropbox/_Notes/10-Work.taskpaper",
     "/Users/krid/Dropbox/_Notes/20-Home.taskpaper",
-#   "/Users/krid/Dropbox/_Notes/30-doing.taskpaper",
+    #"/Users/krid/Dropbox/_Notes/30-doing.taskpaper",
     "/Users/krid/Dropbox/_Notes/40-Studenten.taskpaper",
     "/Users/krid/Dropbox/_Notes/50-Geschenke.taskpaper",
-#   "/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
+    #"/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
 ]
 
 __WEEKDAYS__ = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 __REGEX_WEEKNUMBERS__ = r'@due\(kw([1-9]|[0-4][0-9]|5[0-3])\)'
-__REGEX_DUE_DATES__   = r'@due\((\d{4})-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])\)'
+__REGEX_DUE_DATES__ = r'@due\((\d{4})-(0[1-9]|1[0-2])-([0-2][0-9]|3[0-1])\)'
 __REGEX_REMINDERS__ = r'@remind\(((?:\d{4})-(?:0[1-9]|1[0-2])-(?:[0-2][0-9]|3[0-1]))\s*((?:[0-1][0-9]|2[0-4]):(?:[0-5][0-9]))*\)'
 
 def calc_times(today):
@@ -70,7 +70,7 @@ def change_dates(line, thedate, today, tomorrow):
 
     return line
 
-def handle_week(line, today, tomorrow, week, thisweek):
+def handle_week(line, tomorrow, week, thisweek):
     """check the week number"""
     tomorrow_week = tomorrow.isocalendar()[1]
     __logger__.debug("Week of tomorrow: %d", tomorrow_week)
@@ -122,7 +122,7 @@ def handle_file(file_, today, applescriptbase):
         return 0
 
     tomorrow, thisweek, weekdays = calc_times(today)
-    regex_due  = re.compile(__REGEX_DUE_DATES__)
+    regex_due = re.compile(__REGEX_DUE_DATES__)
     regex_week = re.compile(__REGEX_WEEKNUMBERS__)
     regex_reminder = re.compile(__REGEX_REMINDERS__)
 
@@ -173,7 +173,7 @@ def handle_file(file_, today, applescriptbase):
         if week_match != None:
             week = int(week_match.group(1))
             __logger__.debug("Found week: %d", week)
-            line = handle_week(line, today, tomorrow, week, thisweek)
+            line = handle_week(line, tomorrow, week, thisweek)
 
         reminder_match = regex_reminder.search(line)
         if reminder_match != None:
@@ -252,7 +252,7 @@ def main():
         elif len(cmdres) > 0 and cmdres[0] == "false":
             handle_file(thefile, today, options.applescriptbase)
         elif len(cmdres) > 0 and cmdres[0] == "true":
-            __logger__.info("File %s is currently opened in TP" % (os.path.basename(thefile)))
+            __logger__.info("File %s is currently opened in TP", os.path.basename(thefile))
             cmd = rc.RunCommand(["osascript", options.applescriptbase + "/ParseDueDates.scpt", os.path.basename(thefile)])
             cmdres = cmd.run()
         else:
