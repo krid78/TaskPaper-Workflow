@@ -97,9 +97,6 @@ class TxtBgColor(object):
     bWHITE = "\x1b[47;1m"
     NONE = "\x1b[0m"
 
-    def __init__(self):
-        pass
-
 def handle_line(project, task, thisday, print_list):
     """sort the task into tasklist,
     depending on its flags"""
