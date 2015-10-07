@@ -48,10 +48,10 @@ __FILES__ = [
     "/Users/krid/Dropbox/_Notes/00-Inbox.taskpaper",
     "/Users/krid/Dropbox/_Notes/10-Work.taskpaper",
     "/Users/krid/Dropbox/_Notes/20-Home.taskpaper",
-    #"/Users/krid/Dropbox/_Notes/30-doing.taskpaper",
-    "/Users/krid/Dropbox/_Notes/40-Studenten.taskpaper",
-    "/Users/krid/Dropbox/_Notes/50-Geschenke.taskpaper",
-    #"/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
+    # "/Users/krid/Dropbox/_Notes/30-doing.taskpaper",
+    # "/Users/krid/Dropbox/_Notes/40-Studenten.taskpaper",
+    # "/Users/krid/Dropbox/_Notes/50-Geschenke.taskpaper",
+    # "/Users/krid/Dropbox/_Notes/99-HowToOrganizeTaskPaper.taskpaper",
 ]
 
 # flat colors 30 .. 37
@@ -162,7 +162,7 @@ def handle_file(file_, thisday, print_list):
 
     tpc = tplp.get_tp_parse(contents)
 
-    # TODO task can have chiln as well -> recursive?!
+    # TODO task can have children as well -> recursive?!
     for item in tpc:
         if item['type'] == 'project':
             print_list = handle_line(item['text'], item, thisday, print_list)
