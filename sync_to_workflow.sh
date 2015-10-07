@@ -9,8 +9,8 @@ function copy_file()
 {
   local src=${1}
   local dst=${2}
-  md5src=$(md5 -q ${src})
-  md5dst=$(md5 -q ${dst})
+  md5src=$(md5 -q "${src}")
+  md5dst=$(md5 -q "${dst}")
   if [[ "${md5src}" != "${md5dst}" ]]; then
     echo "Copy ${src} to ${dst}"
     cp "${src}" "${dst}"
@@ -35,6 +35,9 @@ for SRC_FILE in ${SRC_FILES}; do
 done
 
 copy_file launchd/LaunchAgent/de.die-kriestens.taskpaperdate.plist ~/Library/LaunchAgents/de.die-kriestens.taskpaperdate.plist
+
+copy_file "python/taskpaperdaily.py" "$HOME/Library/Application Support/Übersicht/widgets/taskpaper.widget/taskpaperdaily.py"
+
 
 # vim: ts=2:sw=2:tw=80:fileformat=unix
 # vim: comments& comments+=b\:# formatoptions& formatoptions+=or
