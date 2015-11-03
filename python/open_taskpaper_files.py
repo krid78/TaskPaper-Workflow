@@ -18,7 +18,7 @@ import logging.handlers
 import runcommand
 import feedback
 
-__TP_BASEDIR__ = "/Users/krid/Dropbox/_Notes"
+__TP_BASEDIR__ = "/Users/krid/Dropbox/_Tasks"
 __TP_EXTENSION__ = "taskpaper"
 
 def find_files(basedir, extension, filter=""):
