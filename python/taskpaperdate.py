@@ -20,12 +20,16 @@ import re
 import runcommand as rc
 
 __FILES__ = [
-    "/Users/krid/Dropbox/_Tasks/00-Inbox.taskpaper",
-    "/Users/krid/Dropbox/_Tasks/10-Work.taskpaper",
-    "/Users/krid/Dropbox/_Tasks/20-Home.taskpaper",
-    # "/Users/krid/Dropbox/_Tasks/30-doing.taskpaper",
-    # "/Users/krid/Dropbox/_Tasks/40-Studenten.taskpaper",
-    # "/Users/krid/Dropbox/_Tasks/50-Geschenke.taskpaper",
+    # "/Users/krid/Dropbox/_Tasks/00-Inbox.taskpaper",
+    "/Users/krid/Dropbox/_Tasks/00-privat.taskpaper",
+    "/Users/krid/Dropbox/_Tasks/10-tuc.taskpaper",
+    # "/Users/krid/Dropbox/_Tasks/10-Work.taskpaper",
+    "/Users/krid/Dropbox/_Tasks/15-students.taskpaper",
+    # "/Users/krid/Dropbox/_Tasks/20-Home.taskpaper",
+    "/Users/krid/Dropbox/_Tasks/20-set.taskpaper",
+    "/Users/krid/Dropbox/_Tasks/30-doing.taskpaper",
+    "/Users/krid/Dropbox/_Tasks/50-geschenke.taskpaper",
+    "/Users/krid/Dropbox/_Tasks/90-someday.taskpaper",
     # "/Users/krid/Dropbox/_Tasks/99-HowToOrganizeTaskPaper.taskpaper",
 ]
 
