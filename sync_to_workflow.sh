@@ -17,7 +17,7 @@ function copy_file()
   fi
 }
 
-WF_DIR=/Users/krid/Dropbox/Apps/Alfredv2/Alfred.alfredpreferences/workflows/user.workflow.EA45C547-66B2-481A-9281-DC5C7E906D79
+WF_DIR=/Users/krid/CloudStation/Apps/Alfredv2/Alfred.alfredpreferences/workflows/user.workflow.EA45C547-66B2-481A-9281-DC5C7E906D79
 SRC_FILES="python/feedback.py \
 python/open_taskpaper_files.py \
 python/runcommand.py \

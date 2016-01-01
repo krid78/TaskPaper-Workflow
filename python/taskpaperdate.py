@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# vim: ts=4:sw=4:sts=4:tw=120:expandtab:fileencoding=utf-8
+# vim: ts=4:sw=4:sts=4:tw=120:expandtab
 
 
 """
@@ -20,15 +20,15 @@ import re
 import runcommand as rc
 
 __FILES__ = [
-    "/Users/krid/Dropbox/_Tasks/inbox.taskpaper",
-    "/Users/krid/Dropbox/_Tasks/privat.taskpaper",
-    "/Users/krid/Dropbox/_Tasks/tuc.taskpaper",
-    "/Users/krid/Dropbox/_Tasks/students.taskpaper",
-    "/Users/krid/Dropbox/_Tasks/set.taskpaper",
-    "/Users/krid/Dropbox/_Tasks/doing.taskpaper",
-    "/Users/krid/Dropbox/_Tasks/geschenke.taskpaper",
-    "/Users/krid/Dropbox/_Tasks/someday.taskpaper",
-    # "/Users/krid/Dropbox/_Tasks/HowToOrganizeTaskPaper.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/inbox.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/privat.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/tuc.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/students.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/set.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/doing.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/geschenke.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/someday.taskpaper",
+    # "/Users/krid/CloudStation/_Tasks/HowToOrganizeTaskPaper.taskpaper",
 ]
 
 __WEEKDAYS__ = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
