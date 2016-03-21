@@ -233,6 +233,16 @@ def main():
     handler.setFormatter(logging.Formatter("-- %(funcName)s [%(levelname)s]: %(message)s"))
     logger.addHandler(handler)
 
+    scriptbase = os.path.abspath(options.scriptbase.rstrip(os.path.sep))
+    if not os.path.exists(scriptbase):
+        logger.error("%s does not exist!", scriptbase)
+        return
+    elif not os.path.isdir(scriptbase):
+        logger.error("%s is not a directory!", scriptbase)
+        return
+
+    logger.debug("ScriptBase: %s", scriptbase)
+
     ###########################
     # get current date and time
     today = dt.datetime.now() #datetime.datetime(2014, 5, 6, 22, 3, 24, 960222)
@@ -242,7 +252,7 @@ def main():
 
     ###########################
     # cycle through all files
-    cmd = rc.RunCommand(["osascript", "-l", "JavaScript", options.scriptbase + "/TaskPaper3_SaveAllOpenDocuments.scpt"])
+    cmd = rc.RunCommand(["osascript", "-l", "JavaScript", scriptbase + "/TaskPaper3_SaveAllOpenDocuments.scpt"])
     cmdres = cmd.run()
     if cmdres is None:
         __logger__.info("cdmres of %s is None", cmd)
@@ -256,7 +266,7 @@ def main():
     #TODO list as argument
     for thefile in __FILES__:
         __logger__.debug("Result: %s", cmdres)
-        handle_file(thefile, today, options.scriptbase)
+        handle_file(thefile, today, scriptbase)
 
     __logger__.info("End Run for %s", today)
 
