@@ -9,15 +9,17 @@ Email         :  daniel.kriesten@etit.tu-chemnitz.de
 Creation Date :  Di  6 Mai 18:27:28 2014
 """
 
-import sys, os
+import sys
+import os
 import codecs
 import argparse
 import logging
-__logger__ = logging.getLogger(__name__)
 import logging.handlers
 import datetime as dt
 import re
 import runcommand as rc
+
+__logger__ = logging.getLogger(__name__)
 
 __FILES__ = [
     "/Users/krid/CloudStation/_Tasks/inbox.taskpaper",
@@ -46,7 +48,7 @@ def calc_times(today):
         wday = today.date() + dt.timedelta(days=day)
         weekdays[dt.date.weekday(wday)] = wday
 
-    __logger__.debug("tomorrow %s, thisweek %s", tomorrow, thisweek)
+    __logger__.debug("tomorrow %s, thisweek KW%s", tomorrow, thisweek)
     __logger__.debug(weekdays)
 
     return tomorrow, thisweek, weekdays
@@ -85,9 +87,9 @@ def handle_week(line, tomorrow, week, thisweek):
 
     return line
 
-def handle_reminder(line, date, time, applescriptbase):
+def handle_reminder(line, date, time, scriptbase):
     """ handle reminder """
-    command_list = ["osascript", applescriptbase + "/CreateReminder.scpt"]
+    command_list = ["osascript", scriptbase + "/CreateReminder.scpt"]
 
     begin = 0
     if "- " in line:
@@ -109,13 +111,13 @@ def handle_reminder(line, date, time, applescriptbase):
 
     cmdres = cmd.run()
 
-    if cmdres == None:
+    if cmdres is None:
         __logger__.warn("None-Result: %s", cmd)
         return line
 
     return line.replace(" @remind", " @reminded")
 
-def handle_file(file_, today, applescriptbase):
+def handle_file(file_, today, scriptbase):
     """handle one file"""
     with codecs.open(file_, "r", 'utf8') as myfile:
         contents = myfile.readlines()
@@ -182,7 +184,7 @@ def handle_file(file_, today, applescriptbase):
             __logger__.debug("Found Reminder: %s", reminder_match.groups())
             date = reminder_match.group(1)
             time = reminder_match.group(2)
-            line = handle_reminder(line, date, time, applescriptbase)
+            line = handle_reminder(line, date, time, scriptbase)
 
         output += line
 
@@ -201,31 +203,27 @@ def main():
         epilog=u"Tested with TaskPaper v2",
         conflict_handler="resolve")
     parser.add_argument("--version", action="version", version="%(prog)s 0.1")
-    parser.add_argument("-v",
-                        "--verbose",
+    parser.add_argument("-v", "--verbose",
                         default=False,
-                        action="store_true",
-                        help="be verbose"
-                       )
-    parser.add_argument("-d",
-                        "--debug",
-                        default=False,
-                        action="store_true",
-                        help="do debugging to stderr")
-    parser.add_argument("-a",
-                        "--applescriptbase",
+                        action="count",
+                        help=u"be verbose, repeat to increase level")
+    parser.add_argument("-s",
+                        "--scriptbase",
                         default=".",
                         help="the base path for the apple scripts")
 
     (options, args) = parser.parse_known_args()
 
-    ######################
-    # instantiate a logger
+    ##########
+    #python logger zur einfachen Ausgabe von Meldungen
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
+
     handler = logging.StreamHandler(stream=sys.stderr)
 
-    if options.debug:
+    ##########
+    # logger Level ...
+    if options.verbose > 1:
         handler.setLevel(logging.DEBUG)
     elif options.verbose:
         handler.setLevel(logging.INFO)
@@ -244,21 +242,21 @@ def main():
 
     ###########################
     # cycle through all files
+    cmd = rc.RunCommand(["osascript", "-l", "JavaScript", options.scriptbase + "/TaskPaper3_SaveAllOpenDocuments.scpt"])
+    cmdres = cmd.run()
+    if cmdres is None:
+        __logger__.info("cdmres of %s is None", cmd)
+    elif len(cmdres) > 0 and cmdres[0] == "false":
+        __logger__.info("cmdres of %s is false", cmd)
+    elif len(cmdres) > 0 and cmdres[0] == "true":
+        __logger__.info("cmdres of %s is true", cmd)
+    else:
+        __logger__.info("Could not handle result %s of %s", cmdres, cmd)
+
     #TODO list as argument
     for thefile in __FILES__:
-        cmd = rc.RunCommand(["osascript", options.applescriptbase + "/GetNamesOfOpenDocuments.scpt", os.path.basename(thefile)])
-        cmdres = cmd.run()
         __logger__.debug("Result: %s", cmdres)
-        if cmdres == None:
-            __logger__.info("cdmres of %s is None", cmd)
-        elif len(cmdres) > 0 and cmdres[0] == "false":
-            handle_file(thefile, today, options.applescriptbase)
-        elif len(cmdres) > 0 and cmdres[0] == "true":
-            __logger__.info("File %s is currently opened in TP", os.path.basename(thefile))
-            cmd = rc.RunCommand(["osascript", options.applescriptbase + "/ParseDueDates.scpt", os.path.basename(thefile)])
-            cmdres = cmd.run()
-        else:
-            __logger__.info("Could not handle result %s of %s", cmdres, cmd)
+        handle_file(thefile, today, options.scriptbase)
 
     __logger__.info("End Run for %s", today)
 
