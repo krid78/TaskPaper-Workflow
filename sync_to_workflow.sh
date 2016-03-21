@@ -24,9 +24,8 @@ python/runcommand.py \
 python/taskpaperdate.py \
 python/taskpaperdaily.py \
 python/tp_light_parse_022.py \
-applescript/CreateReminder.scpt \
-applescript/GetNamesOfOpenDocuments.scpt \
-applescript/ParseDueDates.scpt"
+javascript/TaskPaper3_SaveAllOpenDocuments.scpt \
+applescript/CreateReminder.scpt"
 
 echo "Using WF: ${WF_DIR}"
 for SRC_FILE in ${SRC_FILES}; do
