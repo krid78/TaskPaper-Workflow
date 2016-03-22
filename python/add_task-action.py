@@ -9,12 +9,12 @@ import logging.handlers
 import runcommand as rc
 import add_task_to_taskpaper as attt
 
-logging.basicConfig()
+logging.basicConfig(level=logging.ERROR)
 __logger__ = logging.getLogger(__name__)
 
 __SCRIPTBASE__ = '.'
 __TASKFOLDER__ = '~/CloudStation/_Tasks'
-__THE_FILE__ = "{query}"
+__THE_TEXT__ = "{query}"
 
 ####################
 # functions
@@ -26,9 +26,6 @@ def tell_tp3_to_save_open_files(scriptbase):
 
 ####################
 if __name__ == '__main__':
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
-    handler = logging.StreamHandler(stream=sys.stderr)
     scriptbase = attt.check_path(__SCRIPTBASE__)
     if scriptbase is None:
         sys.exit(1)
@@ -37,8 +34,9 @@ if __name__ == '__main__':
     if taskfolder is None:
         sys.exit(1)
 
+    thetext = __THE_TEXT__
     tell_tp3_to_save_open_files(scriptbase)
-    theline = attt.OneLine("{query}")
+    theline = attt.OneLine(thetext)
     tpf = attt.TaskPaperFileHandler(theline.file, taskfolder)
     if not tpf.read_file():
         sys.exit(1)
