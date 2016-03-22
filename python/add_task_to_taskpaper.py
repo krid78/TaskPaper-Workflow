@@ -169,6 +169,8 @@ class TaskPaperFileHandler(object):
         with codecs.open(self._tp_abs_filename, "w", 'utf8') as myfile:
             myfile.write(unicode(self._tp_contents))
 
+        return True
+
     def __str__(self):
         thestr = ""
         if self._tp_abs_filename:

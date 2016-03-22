@@ -14,6 +14,7 @@ __logger__ = logging.getLogger(__name__)
 
 __SCRIPTBASE__ = '.'
 __TASKFOLDER__ = '~/CloudStation/_Tasks'
+__THE_FILE__ = "{query}"
 
 ####################
 # functions
@@ -24,32 +25,27 @@ def tell_tp3_to_save_open_files(scriptbase):
     return cmdres
 
 ####################
-# main
-def main():
-    """this is the main file"""
+if __name__ == '__main__':
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler(stream=sys.stderr)
     scriptbase = attt.check_path(__SCRIPTBASE__)
     if scriptbase is None:
-        return False
+        sys.exit(1)
 
     taskfolder = attt.check_path('~/CloudStation/_Tasks/')
     if taskfolder is None:
-        return False
+        sys.exit(1)
 
     tell_tp3_to_save_open_files(scriptbase)
     theline = attt.OneLine("{query}")
     tpf = attt.TaskPaperFileHandler(theline.file, taskfolder)
     if not tpf.read_file():
-        return False
+        sys.exit(1)
     if not tpf.add_task(theline.task, theline.project):
-        return False
+        sys.exit(1)
     if not tpf.write_contents():
-        return False
+        sys.exit(1)
 
-    sys.stdout.write("Task \'%s\' added to \'%s\' in \'%s\'" % (theline.task, theline.project, theline.file))
-
-if __name__ == '__main__':
-    __logger__ = logging.getLogger()
-    __logger__.setLevel(logging.DEBUG)
-    __handler__ = logging.StreamHandler(stream=sys.stderr)
-    main()
+    print "Task \'%s\' added to \'%s\' in \'%s\'" % (theline.task, theline.project, theline.file)
 
