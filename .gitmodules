@@ -1,4 +1,0 @@
-[submodule "python/taskpaper"]
-	path = python/taskpaper
-	url = git@github.com:krid78/python-taskpaper.git
-	branch = master
