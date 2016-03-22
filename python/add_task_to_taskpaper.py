@@ -29,9 +29,9 @@ import codecs
 import argparse
 import logging
 import logging.handlers
-import datetime as dt
+# import datetime as dt
 import runcommand as rc
-import taskpaper.taskpaper as tpp
+import taskpaper as tpp
 
 __logger__ = logging.getLogger(__name__)
 __SCRIPTBASE__ = '.'
@@ -76,7 +76,7 @@ class OneLine(object):
     def __str__(self):
         """pretty print the task-line
         """
-        ret = ""
+        ret = "\n"
         if self._tp_tasktext:
             ret += "Task       : \'%s\'" % (self._tp_tasktext)
         if self._tp_tasktext.tags:
@@ -114,10 +114,72 @@ class OneLine(object):
         """
         return self._tp_file
 
+class TaskPaperFileHandler(object):
+    """Just a wrapper for handling the TaskPaper file"""
+
+    def __init__(self, fname, folder='.'):
+        """constructor"""
+        if not fname.endswith('.taskpaper'):
+            fname += ".taskpaper"
+        self._tp_filename = fname
+        self._tp_abs_filename = check_path(folder + '/' + self._tp_filename, isfile=True)
+        self._tp_contents = None
+
+    def read_file(self):
+        """read the file into the object"""
+        with codecs.open(self._tp_abs_filename, "r", 'utf8') as myfile:
+            self._tp_contents = tpp.TaskPaper.parse(myfile)
+
+        if not self._tp_contents:
+            return False
+
+        return True
+
+    def add_task(self, thetask, theproject):
+        """add the task to the given taskpaper file"""
+        if not self._tp_contents:
+            __logger__.info("contents not read, yet")
+            return False
+
+        found = False
+        item = None
+        for item in self._tp_contents:
+            if item.is_project():
+                __logger__.debug("Project: \'%s\'", item.txt)
+                if item.txt == theproject:
+                    found = True
+                    break
+
+        if found:
+            __logger__.debug("Add %s to %s", thetask, item)
+            item.add_item(thetask)
+        else:
+            __logger__.warn("%s not found", theproject)
+            return False
+
+        return True
+
+    def write_contents(self):
+        """wirtes the current contents to a file"""
+        if not self._tp_contents:
+            __logger__.warn("no contents to write!")
+            return
+
+        with codecs.open(self._tp_abs_filename, "w", 'utf8') as myfile:
+            myfile.write(unicode(self._tp_contents))
+
+    def __str__(self):
+        thestr = ""
+        if self._tp_abs_filename:
+            thestr += self._tp_abs_filename
+        if self._tp_contents:
+            thestr += " is read"
+        return thestr
+
 ########################################################################
 # functions
 ########################################################################
-def save_taskpaper_files(scriptbase):
+def tell_tp3_to_save_open_files(scriptbase):
     """save all files currently opened in TP3"""
     cmd = rc.RunCommand(["osascript", "-l", "JavaScript", scriptbase + "/TaskPaper3_SaveAllOpenDocuments.scpt"])
     cmdres = cmd.run()
@@ -133,7 +195,7 @@ def check_path(relpath, isfile=False):
 
     if isfile:
         if not os.path.isfile(abspath):
-            __logger__.error("%s is not a file!", fullname)
+            __logger__.error("%s is not a file!", abspath)
             return None
     elif not os.path.isdir(abspath):
         __logger__.error("%s is not a directory!", abspath)
@@ -142,38 +204,6 @@ def check_path(relpath, isfile=False):
     __logger__.debug("checked: \'%s\'", abspath)
 
     return abspath
-
-def find_taskpaper_file(taskfolder, fname):
-    """check, if the given name matches an existing file
-    """
-    if not fname.endswith('.taskpaper'):
-        fname = fname + ".taskpaper"
-
-    fullname = check_path(taskfolder + '/' + fname, isfile=True)
-
-    return fullname
-
-def add_task_to_tpfile(thefile, theproject, thetask):
-    """add the task to the given taskpaper file"""
-    with codecs.open(thefile, "r", 'utf8') as myfile:
-        tp_contents = tpp.TaskPaper.parse(myfile)
-
-    found = False
-    item = None
-    for item in tp_contents:
-        if item.is_project():
-            __logger__.debug("Project: \'%s\'", item.txt)
-            if item.txt == theproject:
-                found = True
-                break
-
-    if found:
-        __logger__.debug("Add %s to %s", thetask, item)
-        item.add_item(thetask)
-    else:
-        __logger__.warn("%s not found", task.project)
-
-    __logger__.info(tp_contents)
 
 ########################################################################
 # main
@@ -234,12 +264,27 @@ def main():
 
     ###########################
     # do the action
-    save_taskpaper_files(scriptbase)
+    # tell_tp3_to_save_open_files(scriptbase)
+    # theline = OneLine(options.text[0])
+    # logger.info("theline: %s", theline)
+    # tpfile = find_taskpaper_file(taskfolder, theline.file)
+    # logger.info("tpfile: %s", tpfile)
+    # add_task_to_tpfile(tpfile, theline.project, theline.task)
+
+    tell_tp3_to_save_open_files(scriptbase)
     theline = OneLine(options.text[0])
     logger.info("theline: %s", theline)
-    tpfile = find_taskpaper_file(taskfolder, theline.file)
-    logger.info("tpfile: %s", tpfile)
-    add_task_to_tpfile(tpfile, theline.project, theline.task)
+    tpf = TaskPaperFileHandler(theline.file, taskfolder)
+    logger.info("tpf: %s", tpf)
+    if not tpf.read_file():
+        return False
+    logger.info("tpf: %s", tpf)
+    if not tpf.add_task(theline.task, theline.project):
+        return False
+    if not tpf.write_contents():
+        return False
+
+    logger.info("Task \'%s\' added to \'%s\' in \'%s\'", theline.task, theline.project, theline.file)
 
 if __name__ == '__main__':
     main()
