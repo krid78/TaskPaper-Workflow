@@ -31,7 +31,7 @@ import logging
 import logging.handlers
 import datetime as dt
 import runcommand as rc
-import taskpaper as tpp
+import taskpaper.taskpaper as tpp
 
 __logger__ = logging.getLogger(__name__)
 __SCRIPTBASE__ = '.'
