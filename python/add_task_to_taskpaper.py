@@ -52,11 +52,10 @@ class OneLine(object):
         self._tp_tasktext = None
         self._tp_project = 'Inbox'
         self._tp_file = 'inbox'
-        self._handle_text(text)
+        self._parse(text)
 
-    def _handle_text(self, text):
+    def _parse(self, text):
         """handle a text object to seperate the single parts"""
-        assert text != None
         tline = text.strip().split(' #f ')
         if len(tline) > 1:
             self._tp_file = tline[1]
@@ -118,42 +117,63 @@ class OneLine(object):
 ########################################################################
 # functions
 ########################################################################
+def save_taskpaper_files(scriptbase):
+    """save all files currently opened in TP3"""
+    cmd = rc.RunCommand(["osascript", "-l", "JavaScript", scriptbase + "/TaskPaper3_SaveAllOpenDocuments.scpt"])
+    cmdres = cmd.run()
+    return cmdres
+
+def check_path(relpath, isfile=False):
+    """return full qualified path for relpath or none
+    """
+    abspath = os.path.abspath(relpath.rstrip(os.path.sep))
+    if not os.path.exists(abspath):
+        __logger__.error("%s does not exist!", abspath)
+        return None
+
+    if isfile:
+        if not os.path.isfile(abspath):
+            __logger__.error("%s is not a file!", fullname)
+            return None
+    elif not os.path.isdir(abspath):
+        __logger__.error("%s is not a directory!", abspath)
+        return None
+
+    __logger__.debug("checked: \'%s\'", abspath)
+
+    return abspath
+
 def find_taskpaper_file(taskfolder, fname):
     """check, if the given name matches an existing file
     """
     if not fname.endswith('.taskpaper'):
         fname = fname + ".taskpaper"
 
-    fullname = os.path.abspath(taskfolder + os.path.sep + fname)
-    if not os.path.exists(fullname):
-        __logger__.error("%s does not exist!", fullname)
-        return
-    elif not os.path.isfile(fullname):
-        __logger__.error("%s is not a file!", fullname)
-        return
+    fullname = check_path(taskfolder + '/' + fname, isfile=True)
 
     return fullname
 
-def handle_text(scriptbase, text):
-    """do the action
-    """
+def add_task_to_tpfile(thefile, theproject, thetask):
+    """add the task to the given taskpaper file"""
+    with codecs.open(thefile, "r", 'utf8') as myfile:
+        tp_contents = tpp.TaskPaper.parse(myfile)
 
-    ###########################
-    # cycle through all files
-    cmd = rc.RunCommand(["osascript", "-l", "JavaScript", scriptbase + "/TaskPaper3_SaveAllOpenDocuments.scpt"])
-    cmdres = cmd.run()
-    if cmdres is None:
-        __logger__.info("cdmres of %s is None", cmd)
-    elif len(cmdres) > 0:
-        __logger__.info("cmdres of %s is %s", cmd, cmdres)
+    found = False
+    item = None
+    for item in tp_contents:
+        if item.is_project():
+            __logger__.debug("Project: \'%s\'", item.txt)
+            if item.txt == task.project:
+                found = True
+                break
+
+    if found:
+        __logger__.debug("Add %s to %s", task.task, item)
+        item.add_item(task.task)
     else:
-        __logger__.info("Could not handle result %s of %s", cmdres, cmd)
+        __logger__.warn("%s not found", task.project)
 
-    __logger__.debug("Text to handle: %s", text[0])
-    task = OneLine(text[0])
-    __logger__.debug("-- Result -- \n%s", task)
-
-    return task
+    __logger__.info(tp_contents)
 
 ########################################################################
 # main
@@ -204,57 +224,22 @@ def main():
 
     logger.debug("remaining args: %s", args)
 
-    scriptbase = os.path.abspath(options.scriptbase.rstrip(os.path.sep))
-    if not os.path.exists(scriptbase):
-        logger.error("%s does not exist!", scriptbase)
-        return
-    elif not os.path.isdir(scriptbase):
-        logger.error("%s is not a directory!", scriptbase)
+    scriptbase = check_path(options.scriptbase)
+    if scriptbase is None:
         return
 
-    logger.debug("ScriptBase: %s", scriptbase)
-
-    taskfolder = os.path.abspath(options.taskfolder.rstrip(os.path.sep))
-    if not os.path.exists(taskfolder):
-        logger.error("%s does not exist!", taskfolder)
+    taskfolder = check_path(options.taskfolder)
+    if taskfolder is None:
         return
-    elif not os.path.isdir(taskfolder):
-        logger.error("%s is not a directory!", taskfolder)
-        return
-
-    logger.debug("taskfolder: %s", taskfolder)
-
-    ###########################
-    # get current date and time
-    today = dt.datetime.now()
-    __logger__.info("Run for %s", today)
 
     ###########################
     # do the action
-    task = handle_text(scriptbase, options.text)
-    tpfile = find_taskpaper_file(taskfolder, task.file)
-    __logger__.debug("tpfile: %s", tpfile)
-    with codecs.open(tpfile, "r", 'utf8') as myfile:
-        tp_contents = tpp.TaskPaper.parse(myfile)
-
-    found = False
-    item = None
-    for item in tp_contents:
-        if item.is_project():
-            __logger__.debug("Project: \'%s\'", item.txt)
-            if item.txt == task.project:
-                found = True
-                break
-
-    if found:
-        __logger__.debug("Add %s to %s", task.task, item)
-        item.add_item(task.task)
-    else:
-        __logger__.warn("%s not found", task.project)
-
-    __logger__.info("End Run for %s", today)
-
-    logger.info(tp_contents)
+    save_taskpaper_files(scriptbase)
+    theline = OneLine(options.text[0])
+    logger.info("theline: %s", theline)
+    tpfile = find_taskpaper_file(taskfolder, theline.file)
+    logger.info("tpfile: %s", tpfile)
+    add_task_to_tpfile(tpfile, theline.project, theline.task)
 
 if __name__ == '__main__':
     main()
