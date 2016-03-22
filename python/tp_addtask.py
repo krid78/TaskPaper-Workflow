@@ -31,17 +31,25 @@ import logging
 import logging.handlers
 import datetime as dt
 import runcommand as rc
+import taskpaper as tpp
 
 __logger__ = logging.getLogger(__name__)
+__SCRIPTBASE__ = '.'
+__TASKFOLDER__ = '~/CloudStation/_Tasks'
 
+########################################################################
+# classes
+########################################################################
 class OneLine(object):
-    """keeps information of that one line"""
+    """keeps information of that one line, containing
+    <task> :p <project> #f <file>
+    """
 
     def __init__(self, text):
         """Constructor, handling that one line of text
         :text: string
         """
-        self._tp_task = None
+        self._tp_tasktext = None
         self._tp_project = 'Inbox'
         self._tp_file = 'inbox'
         self._handle_text(text)
@@ -49,22 +57,31 @@ class OneLine(object):
     def _handle_text(self, text):
         """handle a text object to seperate the single parts"""
         assert text != None
-        tline = text.split(' #f ')
+        tline = text.strip().split(' #f ')
         if len(tline) > 1:
             self._tp_file = tline[1]
 
         tline = tline[0].split(' :p ')
         if len(tline) > 1:
             self._tp_project = tline[1]
+            if not self._tp_project.endswith(':'):
+                self._tp_project += ':'
 
-        self._tp_task = tline[0]
+        tasktext = tline[0]
+
+        if not tasktext.startswith("- "):
+            tasktext = "- %s" % (tasktext)
+
+        self._tp_tasktext = tpp.TaskItem.parse(tasktext)
 
     def __str__(self):
         """pretty print the task-line
         """
         ret = ""
-        if self._tp_task:
-            ret += "Task       : \'%s\'" % (self._tp_task)
+        if self._tp_tasktext:
+            ret += "Task       : \'%s\'" % (self._tp_tasktext)
+        if self._tp_tasktext.tags:
+            ret += "\nTags       : \'%s\'" % (self._tp_tasktext.tags)
         if self._tp_project:
             ret += "\nFor project: \'%s\'" % (self._tp_project)
         if self._tp_file:
@@ -78,8 +95,8 @@ class OneLine(object):
         """return the task text
         :returns: string
         """
-        if self.task:
-            return self._tp_task
+        if self._tp_tasktext:
+            return self._tp_tasktext
 
         return ""
 
@@ -98,6 +115,49 @@ class OneLine(object):
         """
         return self._tp_file
 
+########################################################################
+# functions
+########################################################################
+def find_taskpaper_file(taskfolder, fname):
+    """check, if the given name matches an existing file
+    """
+    if not fname.endswith('.taskpaper'):
+        fname = fname + ".taskpaper"
+
+    fullname = os.path.abspath(taskfolder + os.path.sep + fname)
+    if not os.path.exists(fullname):
+        __logger__.error("%s does not exist!", fullname)
+        return
+    elif not os.path.isfile(fullname):
+        __logger__.error("%s is not a file!", fullname)
+        return
+
+    return fullname
+
+def handle_text(scriptbase, text):
+    """do the action
+    """
+
+    ###########################
+    # cycle through all files
+    cmd = rc.RunCommand(["osascript", "-l", "JavaScript", scriptbase + "/TaskPaper3_SaveAllOpenDocuments.scpt"])
+    cmdres = cmd.run()
+    if cmdres is None:
+        __logger__.info("cdmres of %s is None", cmd)
+    elif len(cmdres) > 0:
+        __logger__.info("cmdres of %s is %s", cmd, cmdres)
+    else:
+        __logger__.info("Could not handle result %s of %s", cmdres, cmd)
+
+    __logger__.debug("Text to handle: %s", text[0])
+    task = OneLine(text[0])
+    __logger__.debug("-- Result -- \n%s", task)
+
+    return task
+
+########################################################################
+# main
+########################################################################
 def main():
     """the working cow"""
 
@@ -113,11 +173,11 @@ def main():
                         help=u"be verbose, repeat to increase level")
     parser.add_argument("-s",
                         "--scriptbase",
-                        default=".",
+                        default=__SCRIPTBASE__,
                         help="the base path for the apple scripts")
     parser.add_argument("-t",
                         "--taskfolder",
-                        default=".",
+                        default=__TASKFOLDER__,
                         help="the base path for the taskpaper files")
     parser.add_argument("text", nargs=1, help="text to add")
 
@@ -142,6 +202,8 @@ def main():
     handler.setFormatter(logging.Formatter("-- %(funcName)s [%(levelname)s]: %(message)s"))
     logger.addHandler(handler)
 
+    logger.debug("remaining args: %s", args)
+
     scriptbase = os.path.abspath(options.scriptbase.rstrip(os.path.sep))
     if not os.path.exists(scriptbase):
         logger.error("%s does not exist!", scriptbase)
@@ -165,25 +227,34 @@ def main():
     ###########################
     # get current date and time
     today = dt.datetime.now()
-
-    logger.info("Run for %s", today)
+    __logger__.info("Run for %s", today)
 
     ###########################
-    # cycle through all files
-    cmd = rc.RunCommand(["osascript", "-l", "JavaScript", scriptbase + "/TaskPaper3_SaveAllOpenDocuments.scpt"])
-    cmdres = cmd.run()
-    if cmdres is None:
-        logger.info("cdmres of %s is None", cmd)
-    elif len(cmdres) > 0:
-        logger.info("cmdres of %s is %s", cmd, cmdres)
+    # do the action
+    task = handle_text(scriptbase, options.text)
+    tpfile = find_taskpaper_file(taskfolder, task.file)
+    __logger__.debug("tpfile: %s", tpfile)
+    with codecs.open(tpfile, "r", 'utf8') as myfile:
+        tp_contents = tpp.TaskPaper.parse(myfile)
+
+    found = False
+    item = None
+    for item in tp_contents:
+        if item.is_project():
+            __logger__.debug("Project: \'%s\'", item.txt)
+            if item.txt == task.project:
+                found = True
+                break
+
+    if found:
+        __logger__.debug("Add %s to %s", task.task, item)
+        item.add_item(task.task)
     else:
-        logger.info("Could not handle result %s of %s", cmdres, cmd)
+        __logger__.warn("%s not found", task.project)
 
-    logger.debug("Text to handle: %s", options.text[0])
-    task = OneLine(options.text[0])
-    logger.info("-- Result -- \n%s", task)
+    __logger__.info("End Run for %s", today)
 
-    logger.info("End Run for %s", today)
+    logger.info(tp_contents)
 
 if __name__ == '__main__':
     main()
