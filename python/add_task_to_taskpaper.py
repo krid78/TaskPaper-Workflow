@@ -163,13 +163,13 @@ def add_task_to_tpfile(thefile, theproject, thetask):
     for item in tp_contents:
         if item.is_project():
             __logger__.debug("Project: \'%s\'", item.txt)
-            if item.txt == task.project:
+            if item.txt == theproject:
                 found = True
                 break
 
     if found:
-        __logger__.debug("Add %s to %s", task.task, item)
-        item.add_item(task.task)
+        __logger__.debug("Add %s to %s", thetask, item)
+        item.add_item(thetask)
     else:
         __logger__.warn("%s not found", task.project)
 
