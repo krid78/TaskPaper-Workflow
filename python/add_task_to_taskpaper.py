@@ -27,13 +27,14 @@ import os
 import sys
 import codecs
 import argparse
+# import datetime as dt
 import logging
 import logging.handlers
-# import datetime as dt
 import runcommand as rc
 import taskpaper as tpp
 
 __logger__ = logging.getLogger(__name__)
+
 __SCRIPTBASE__ = '.'
 __TASKFOLDER__ = '~/CloudStation/_Tasks'
 
@@ -50,7 +51,7 @@ class OneLine(object):
         :text: string
         """
         self._tp_tasktext = None
-        self._tp_project = 'Inbox'
+        self._tp_project = 'Inbox:'
         self._tp_file = 'inbox'
         self._parse(text)
 
@@ -154,7 +155,7 @@ class TaskPaperFileHandler(object):
             __logger__.debug("Add %s to %s", thetask, item)
             item.add_item(thetask)
         else:
-            __logger__.warn("%s not found", theproject)
+            __logger__.warn("\'%s\' not found", theproject)
             return False
 
         return True
@@ -188,6 +189,7 @@ def tell_tp3_to_save_open_files(scriptbase):
 def check_path(relpath, isfile=False):
     """return full qualified path for relpath or none
     """
+    relpath = os.path.expanduser(relpath)
     abspath = os.path.abspath(relpath.rstrip(os.path.sep))
     if not os.path.exists(abspath):
         __logger__.error("%s does not exist!", abspath)
