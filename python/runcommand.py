@@ -18,7 +18,6 @@ import logging
 import logging.handlers
 __logger__ = logging.getLogger(__name__)
 
-
 class RunCommand(object):
     '''wrapper class for running a command with timeout'''
 
