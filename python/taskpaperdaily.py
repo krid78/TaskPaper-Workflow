@@ -17,11 +17,12 @@ import json
 import argparse
 import datetime as dt
 import logging
-__logger__ = logging.getLogger(__name__)
 import logging.handlers
 
 #FIXME there seems to be a bug in the parser, which handles single word projects incorrect
 import tp_light_parse_022 as tplp
+
+__logger__ = logging.getLogger(__name__)
 
 __FILES__ = [
     "/Users/krid/CloudStation/_Tasks/inbox.taskpaper",
@@ -132,7 +133,7 @@ class PrintTP(object):
         for item in list_:
             liststring += u"%s\n" % (item)
             count += 1
-            if (count >= count_max) and (self.print_all == False):
+            if (count >= count_max) and (self.print_all is False):
                 break
         return liststring
 
