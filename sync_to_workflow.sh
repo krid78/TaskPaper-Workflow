@@ -18,11 +18,13 @@ function copy_file()
 }
 
 WF_DIR=/Users/krid/CloudStation/Apps/Alfredv2/Alfred.alfredpreferences/workflows/user.workflow.EA45C547-66B2-481A-9281-DC5C7E906D79
-SRC_FILES="python/feedback.py \
+SRC_FILES="python/add_task_to_taskpaper.py \
+python/feedback.py \
 python/open_taskpaper_files.py \
 python/runcommand.py \
-python/taskpaperdate.py \
+python/taskpaper.py \
 python/taskpaperdaily.py \
+python/taskpaperdate.py \
 python/tp_light_parse_022.py \
 javascript/TaskPaper3_SaveAllOpenDocuments.scpt \
 applescript/CreateReminder.scpt"
@@ -36,7 +38,6 @@ done
 copy_file launchd/LaunchAgent/de.die-kriestens.taskpaperdate.plist ~/Library/LaunchAgents/de.die-kriestens.taskpaperdate.plist
 
 copy_file "python/taskpaperdaily.py" "$HOME/Library/Application Support/Übersicht/widgets/taskpaper.widget/taskpaperdaily.py"
-
 
 # vim: ts=2:sw=2:tw=80:fileformat=unix
 # vim: comments& comments+=b\:# formatoptions& formatoptions+=or
