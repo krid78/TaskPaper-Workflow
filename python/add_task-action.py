@@ -24,26 +24,35 @@ def tell_tp3_to_save_open_files(scriptbase):
     cmdres = cmd.run()
     return cmdres
 
-####################
-if __name__ == '__main__':
+def main():
+    """the main function to have a dedicated scope
+    """
     scriptbase = attt.check_path(__SCRIPTBASE__)
     if scriptbase is None:
-        sys.exit(1)
+        return False
 
     taskfolder = attt.check_path('~/CloudStation/_Tasks/')
     if taskfolder is None:
-        sys.exit(1)
+        return False
 
-    thetext = __THE_TEXT__
+    thetext = unicode(__THE_TEXT__, 'utf8')
     tell_tp3_to_save_open_files(scriptbase)
     theline = attt.OneLine(thetext)
     tpf = attt.TaskPaperFileHandler(theline.file, taskfolder)
     if not tpf.read_file():
-        sys.exit(1)
+        return False
     if not tpf.add_task(theline.task, theline.project):
-        sys.exit(1)
+        return False
     if not tpf.write_contents():
-        sys.exit(1)
+        return False
 
     print "Task \'%s\' added to \'%s\' in \'%s\'" % (theline.task, theline.project, theline.file)
 
+    return True
+
+####################
+if __name__ == '__main__':
+    if main():
+        sys.exit(0)
+    else:
+        sys.exit(1)
