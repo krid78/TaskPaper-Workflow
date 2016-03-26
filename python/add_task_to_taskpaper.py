@@ -276,7 +276,7 @@ def main():
     # add_task_to_tpfile(tpfile, theline.project, theline.task)
 
     tell_tp3_to_save_open_files(scriptbase)
-    theline = OneLine(options.text[0])
+    theline = OneLine(unicode(options.text[0], 'utf8'))
     logger.info("theline: %s", theline)
     tpf = TaskPaperFileHandler(theline.file, taskfolder)
     logger.info("tpf: %s", tpf)
