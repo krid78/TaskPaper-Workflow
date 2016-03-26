@@ -23,6 +23,7 @@ add a new: text
 
 """
 
+from __future__ import unicode_literals
 import os
 import sys
 import codecs

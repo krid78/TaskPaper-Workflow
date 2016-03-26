@@ -3,13 +3,14 @@
 
 """ call the handler"""
 
+from __future__ import unicode_literals
 import sys
 import logging
 import logging.handlers
 import runcommand as rc
 import add_task_to_taskpaper as attt
 
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.DEBUG)
 __logger__ = logging.getLogger(__name__)
 
 __SCRIPTBASE__ = '.'
@@ -25,8 +26,7 @@ def tell_tp3_to_save_open_files(scriptbase):
     return cmdres
 
 def main():
-    """the main function to have a dedicated scope
-    """
+    """the main function to have a dedicated scope """
     scriptbase = attt.check_path(__SCRIPTBASE__)
     if scriptbase is None:
         return False
@@ -35,7 +35,11 @@ def main():
     if taskfolder is None:
         return False
 
-    thetext = unicode(__THE_TEXT__, 'utf8')
+    if len(sys.argv) > 1:
+        thetext = sys.argv[1].decode('utf-8')
+    else:
+        thetext = __THE_TEXT__
+    __logger__.debug("In: \'%s\'", unicode(thetext))
     tell_tp3_to_save_open_files(scriptbase)
     theline = attt.OneLine(thetext)
     tpf = attt.TaskPaperFileHandler(theline.file, taskfolder)
