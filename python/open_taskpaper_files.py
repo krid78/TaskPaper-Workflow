@@ -10,20 +10,21 @@ Creation Date :  Di  6 Mai 18:27:28 2014
 A script to open taskpaper files
 """
 
+import os.path as osp
 import sys
 import argparse
 import logging
-__logger__ = logging.getLogger(__name__)
 import logging.handlers
 import runcommand
 import feedback
 
+__logger__ = logging.getLogger(__name__)
 __TP_BASEDIR__ = "/Users/krid/CloudStation/_Tasks"
 __TP_EXTENSION__ = "taskpaper"
 
-def find_files(basedir, extension, filter=""):
+def find_files(basedir, extension, afilter=""):
     """create a list of tp files"""
-    command = ["mdfind", "-onlyin", basedir, "kMDItemFSName==" + filter + "*." + extension]
+    command = ["mdfind", "-onlyin", basedir, "kMDItemFSName==" + afilter + "*." + extension]
     __logger__.debug(command)
     # simple call to run a system process
     cmd = runcommand.RunCommand(command)
@@ -32,7 +33,7 @@ def find_files(basedir, extension, filter=""):
     if file_list != None:
         __logger__.debug(file_list)
         for file_ in sorted(file_list):
-            atree.add_item(file_, subtitle="Open " + file_ + "in TaskPaper", arg=file_)
+            atree.add_item(osp.basename(file_), subtitle="Open " + file_ + " in TaskPaper", arg=file_)
     __logger__.info(atree)
     alfred_xml = repr(atree)
     return alfred_xml
@@ -85,7 +86,7 @@ def main():
     logger.addHandler(handler)
 
     # run the working task
-    ret = find_files(options.basedir.replace(" ", "\ "), options.extension, options.filter)
+    ret = find_files(options.basedir.replace(" ", "\\ "), options.extension, options.filter.strip())
     if ret != None:
         sys.stdout.write(ret)
 
