@@ -25,14 +25,13 @@ import tp_light_parse_022 as tplp
 __logger__ = logging.getLogger(__name__)
 
 __FILES__ = [
-    "/Users/krid/CloudStation/_Tasks/inbox.taskpaper",
-    "/Users/krid/CloudStation/_Tasks/privat.taskpaper",
-    "/Users/krid/CloudStation/_Tasks/tuc.taskpaper",
-    "/Users/krid/CloudStation/_Tasks/students.taskpaper",
-    "/Users/krid/CloudStation/_Tasks/set.taskpaper",
     "/Users/krid/CloudStation/_Tasks/doing.taskpaper",
     "/Users/krid/CloudStation/_Tasks/geschenke.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/inbox.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/privat.taskpaper",
     "/Users/krid/CloudStation/_Tasks/someday.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/students.taskpaper",
+    "/Users/krid/CloudStation/_Tasks/work.taskpaper",
     # "/Users/krid/CloudStation/_Tasks/HowToOrganizeTaskPaper.taskpaper",
 ]
 
