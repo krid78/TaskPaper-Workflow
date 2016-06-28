@@ -146,6 +146,12 @@ def handle_file(file_, today, scriptbase):
         #add linebrake to last line
         output += "\n"
 
+        # leaf all searches of TP3 untouched
+        if '@search' in line:
+            __logger__.debug("SearchLine: %s", line)
+            output += line
+            continue
+
         # if the project is done, remove relative dates
         if '@done' in line:
             line = line.replace("@urgent", "")
