@@ -28,7 +28,7 @@ __FILES__ = [
     "/Users/krid/CloudStation/_Tasks/privat.taskpaper",
     "/Users/krid/CloudStation/_Tasks/someday.taskpaper",
     "/Users/krid/CloudStation/_Tasks/students.taskpaper",
-    "/Users/krid/CloudStation/_Tasks/work.taskpaper",
+    # "/Users/krid/CloudStation/_Tasks/work.taskpaper",
     # "/Users/krid/CloudStation/_Tasks/HowToOrganizeTaskPaper.taskpaper",
 ]
 
